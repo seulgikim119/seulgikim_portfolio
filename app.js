@@ -38,9 +38,6 @@ const st = {
   lensSize:    180,
   introActive: true,
   carouselIdx: 0,
-  drag:        0,
-  dragging:    false,
-  dragStartX:  0,
 };
 
 // ─── UTILITIES ───────────────────────────────────────────────────────────────
@@ -91,7 +88,11 @@ function cloverHTML({ size, color, colorDark, leaves = 3, lucky = false }) {
       <circle r="1.6" fill="${colorDark}" opacity="0.8"/>
       ${lucky ? '<circle r="0.9" cx="0.5" cy="-1" fill="#fff7d6"/>' : ''}
     </g>
-  </svg>`;
+</svg>`;
+}
+
+function luckyCloverImageHTML(size) {
+  return `<img class="intro-lucky-clover-img" src="assets/lucky-four-clover.png" alt="" width="${size}" height="${size}">`;
 }
 
 // 코너 클로버: CSS 변수로 색상을 받아 팔레트 변경 시 자동 반영
@@ -130,7 +131,7 @@ function generateIntroData(density) {
   const count = density;
   const flX   = 56 + rng() * 12;
   const flY   = 48 + rng() * 18;
-  const fl    = { x: flX, y: flY, size: 64, rot: -20 + rng() * 40 };
+  const fl    = { x: flX, y: flY, size: 92, rot: -20 + rng() * 40 };
   const items = [];
 
   for (let i = 0; i < count; i++) {
@@ -172,23 +173,12 @@ function buildCloverField(container, clovers, fourLeaf, greens) {
       opacity:   String(0.6 + c.z * 0.4),
       filter:    c.z < 0.4 ? 'blur(0.6px)' : 'none',
     });
+    wrap.className = 'intro-generated-clover';
     wrap.innerHTML = cloverHTML({ size: c.size, color, colorDark: greens[3], leaves: 3 });
     container.appendChild(wrap);
   });
 
-  const fl = document.createElement('div');
-  Object.assign(fl.style, {
-    position:   'absolute',
-    left:       fourLeaf.x + '%',
-    top:        fourLeaf.y + '%',
-    transform:  `translate(-50%,-50%) rotate(${fourLeaf.rot}deg) scale(0.9)`,
-    opacity:    '0',
-    transition: 'opacity .25s ease, transform .35s cubic-bezier(.2,.9,.3,1.3)',
-    zIndex:     '5',
-  });
-  fl.innerHTML = cloverHTML({ size: fourLeaf.size, color: greens[1], colorDark: greens[3], leaves: 4, lucky: true });
-  container.appendChild(fl);
-  return fl;
+  return null;
 }
 
 let _introCleanup = null;
@@ -211,8 +201,9 @@ function initIntro() {
   // 시각 상태 초기화
   intro.removeAttribute('hidden');
   intro.style.cssText = '';
-  intro.querySelectorAll('.hero-clover, .twinkle, .found-msg').forEach(el => el.remove());
+  intro.querySelectorAll('.hero-clover, .twinkle, .found-msg, .intro-lucky-target, .intro-section-choice').forEach(el => el.remove());
   lens.classList.remove('found');
+  lens.style.display = '';
   fieldBw.classList.remove('blurred');
   fieldColor.classList.remove('blurred');
   fieldBw.innerHTML    = '';
@@ -227,8 +218,21 @@ function initIntro() {
   const lensR  = st.lensSize / 2;
   const { clovers, fourLeaf, twinkles } = generateIntroData(st.density);
 
-  const fl4bw    = buildCloverField(fieldBw,    clovers, fourLeaf, greens);
-  const fl4color = buildCloverField(fieldColor, clovers, fourLeaf, greens);
+  buildCloverField(fieldBw,    clovers, fourLeaf, greens);
+  buildCloverField(fieldColor, clovers, fourLeaf, greens);
+
+  const luckyTarget = document.createElement('div');
+  luckyTarget.className = 'intro-lucky-target';
+  Object.assign(luckyTarget.style, {
+    left:      fourLeaf.x + '%',
+    top:       fourLeaf.y + '%',
+    width:     (fourLeaf.size * 1.85) + 'px',
+    height:    (fourLeaf.size * 1.85) + 'px',
+    transform: `translate(-50%,-50%) rotate(${fourLeaf.rot}deg) scale(0.9)`,
+    opacity:   '0',
+  });
+  luckyTarget.innerHTML = luckyCloverImageHTML(fourLeaf.size * 1.85);
+  intro.appendChild(luckyTarget);
 
   Object.assign(sparkle.style, {
     left:      fourLeaf.x + '%',
@@ -260,34 +264,36 @@ function initIntro() {
   function getFl4Pos() {
     const r = intro.getBoundingClientRect();
     return {
-      x: r.left + (fourLeaf.x / 100) * r.width,
-      y: r.top  + (fourLeaf.y / 100) * r.height,
+      x: (fourLeaf.x / 100) * r.width,
+      y: (fourLeaf.y / 100) * r.height,
     };
   }
 
   function update(cx, cy) {
-    cursor.x = cx; cursor.y = cy;
-    intro.style.setProperty('--mx', cx + 'px');
-    intro.style.setProperty('--my', cy + 'px');
-    lens.style.left = cx + 'px';
-    lens.style.top  = cy + 'px';
+    const r = intro.getBoundingClientRect();
+    const localX = cx - r.left;
+    const localY = cy - r.top;
+
+    cursor.x = localX; cursor.y = localY;
+    intro.style.setProperty('--mx', localX + 'px');
+    intro.style.setProperty('--my', localY + 'px');
+    lens.style.left = localX + 'px';
+    lens.style.top  = localY + 'px';
 
     const { x: fx, y: fy } = getFl4Pos();
-    const dist   = Math.hypot(cx - fx, cy - fy);
-    const inLens = dist < lensR - 8;
+    const dist   = Math.hypot(localX - fx, localY - fy);
+    const inLens = dist < lensR + 18;
     const scale  = inLens ? 1.15 : 0.9;
-    const flOp   = inLens && !found ? '1' : '0';
+    const flOp   = found ? '0' : inLens ? '1' : '0';
 
-    [fl4bw, fl4color].forEach(el => {
-      el.style.transform = `translate(-50%,-50%) rotate(${fourLeaf.rot}deg) scale(${scale})`;
-      el.style.opacity   = flOp;
-    });
+    luckyTarget.style.transform = `translate(-50%,-50%) rotate(${fourLeaf.rot}deg) scale(${scale})`;
+    luckyTarget.style.opacity = flOp;
 
     sparkle.style.opacity = dist > lensR ? '1' : '0';
     foundHint.classList.toggle('show', inLens && !found);
     if (inLens && !found) {
-      foundHint.style.left = (cx + 20) + 'px';
-      foundHint.style.top  = (cy + lensR - 6) + 'px';
+      foundHint.style.left = (localX + 20) + 'px';
+      foundHint.style.top  = (localY + lensR - 6) + 'px';
     }
     twinkleEls.forEach(el => { el.style.opacity = inLens ? '0' : '1'; });
   }
@@ -295,46 +301,66 @@ function initIntro() {
   function onFound() {
     found = true;
     lens.classList.add('found');
+    lens.style.display = 'none';
     fieldBw.classList.add('blurred');
     fieldColor.classList.add('blurred');
     sparkle.style.display   = 'none';
     foundHint.style.display = 'none';
     twinkleEls.forEach(el => { el.style.display = 'none'; });
 
-    const hero = document.createElement('div');
-    hero.className = 'hero-clover';
-    hero.style.cssText = 'left:50%;top:50%';
-    hero.innerHTML = cloverHTML({ size: fourLeaf.size, color: greens[1], colorDark: greens[3], leaves: 4, lucky: true });
-    intro.appendChild(hero);
+    const r = intro.getBoundingClientRect();
+    const currentLeft = parseFloat(luckyTarget.style.left) / 100 * r.width;
+    const currentTop = parseFloat(luckyTarget.style.top) / 100 * r.height;
+    luckyTarget.classList.add('zooming');
+    Object.assign(luckyTarget.style, {
+      left: currentLeft + 'px',
+      top: currentTop + 'px',
+      opacity: '1',
+      transform: `translate(-50%,-50%) rotate(${fourLeaf.rot}deg) scale(1.15)`,
+    });
 
-    setTimeout(() => {
-      const msg = document.createElement('div');
-      msg.className = 'found-msg';
-      msg.style.cssText = 'position:absolute;left:50%;top:78%;transform:translate(-50%,-50%);z-index:40;text-align:center;animation:rise .8s .6s both';
-      msg.innerHTML = `
-        <div style="font-size:11px;letter-spacing:.4em;color:var(--gold-deep);margin-bottom:16px">FOUND</div>
-        <h2 class="serif" style="font-size:48px;margin:0;color:var(--ink);letter-spacing:-.02em">행운을 찾으셨네요</h2>`;
-      intro.appendChild(msg);
-    }, 200);
+    requestAnimationFrame(() => {
+      Object.assign(luckyTarget.style, {
+        left: '50%',
+        top: '50%',
+        transform: 'translate(-50%,-50%) rotate(0deg) scale(4.8)',
+      });
+    });
 
-    setTimeout(() => {
-      jumpToPageTop();
+    function enterSection(targetId) {
       intro.style.opacity       = '0';
       intro.style.transition    = 'opacity .7s ease';
       intro.style.pointerEvents = 'none';
       setTimeout(() => {
         intro.setAttribute('hidden', '');
         st.introActive = false;
-        jumpToPageTop();
+        const target = document.getElementById(targetId);
+        const top = target ? target.offsetTop : 0;
+        window.scrollTo({ top, left: 0, behavior: 'instant' });
       }, 700);
-    }, 1400);
+    }
+
+    setTimeout(() => {
+      const nav = document.createElement('nav');
+      nav.className = 'intro-section-choice';
+      nav.setAttribute('aria-label', '섹션 선택');
+      nav.innerHTML = `
+        <button class="leaf-choice leaf-choice-hope" type="button" data-target="leaf1"><span>01</span>Hope</button>
+        <button class="leaf-choice leaf-choice-faith" type="button" data-target="leaf2"><span>02</span>Faith</button>
+        <button class="leaf-choice leaf-choice-happiness" type="button" data-target="leaf3"><span>03</span>Happiness</button>
+        <button class="leaf-choice leaf-choice-luck" type="button" data-target="leaf4"><span>04</span>Luck</button>`;
+      nav.querySelectorAll('button').forEach(btn => {
+        btn.addEventListener('click', () => enterSection(btn.dataset.target));
+      });
+      intro.appendChild(nav);
+    }, 760);
   }
 
   function onMouseMove(e) { update(e.clientX, e.clientY); }
   function onIntroClick() {
     if (found) return;
     const { x: fx, y: fy } = getFl4Pos();
-    if (Math.hypot(cursor.x - fx, cursor.y - fy) >= lensR - 8) return;
+    if (Math.hypot(cursor.x - fx, cursor.y - fy) >= lensR + 18) return;
     onFound();
   }
 
@@ -478,12 +504,12 @@ function initPolaroid() {
       const isCenter = offset === 0;
       const centerScale = window.innerWidth <= 720 ? 1.18 : 1.5;
       const sideGap = window.innerWidth <= 720 ? 300 : 470;
-      const x   = offset * sideGap + (st.dragging ? st.drag : 0);
+      const x   = offset * sideGap;
       const rot = TILTS[i] + (isCenter ? 0 : offset < 0 ? -6 : 6);
       card.style.transform  = `translate(-50%, -50%) translateX(${x}px) rotate(${rot}deg) scale(${isCenter ? centerScale : 0.78})`;
       card.style.zIndex     = String(isCenter ? 5 : Math.abs(offset) === 1 ? 3 : 1);
       card.style.opacity    = String(Math.abs(offset) > 2 ? 0 : isCenter ? 1 : 0.55);
-      card.style.transition = st.dragging ? 'none' : 'transform .55s cubic-bezier(.2,.9,.3,1.05), opacity .35s ease';
+      card.style.transition = 'transform .55s cubic-bezier(.2,.9,.3,1.05), opacity .35s ease';
       card.classList.toggle('active', isCenter);
     });
     dots.forEach((dot, i) => dot.classList.toggle('active', i === st.carouselIdx));
@@ -491,25 +517,6 @@ function initPolaroid() {
     document.querySelector('.polaroid-arrow.left').disabled  = st.carouselIdx === 0;
     document.querySelector('.polaroid-arrow.right').disabled = st.carouselIdx === total - 1;
   }
-
-  function getX(e) { return e.touches ? e.touches[0].clientX : e.clientX; }
-
-  track.addEventListener('mousedown', e => { st.dragging = true; st.drag = 0; st.dragStartX = getX(e); render(); });
-  track.addEventListener('touchstart', e => { st.dragging = true; st.drag = 0; st.dragStartX = getX(e); render(); }, { passive: true });
-
-  window.addEventListener('mousemove', e => { if (!st.dragging) return; st.drag = getX(e) - st.dragStartX; render(); });
-  window.addEventListener('touchmove', e => { if (!st.dragging) return; st.drag = getX(e) - st.dragStartX; render(); }, { passive: true });
-
-  function onUp() {
-    if (!st.dragging) return;
-    st.dragging = false;
-    if      (st.drag > 60  && st.carouselIdx > 0)             st.carouselIdx--;
-    else if (st.drag < -60 && st.carouselIdx < total - 1) st.carouselIdx++;
-    st.drag = 0;
-    render();
-  }
-  window.addEventListener('mouseup',  onUp);
-  window.addEventListener('touchend', onUp);
 
   document.querySelector('.polaroid-arrow.left')
     ?.addEventListener('click', () => { if (st.carouselIdx > 0) { st.carouselIdx--; render(); } });
