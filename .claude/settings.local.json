@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cat /tmp/design_extracted/remix/chats/chat1.md)",
+      "Read(//tmp/design_extracted/remix/chats/**)",
+      "Read(//tmp/design_extracted/remix/**)",
+      "Read(//tmp/design_extracted/remix/project/**)",
+      "Bash(ls \"c:\\\\김슬기\\\\김슬기\\\\portfoli02\\\\\" 2>&1 | head -30)",
+      "Read(//c/김슬기/김슬기/**)"
+    ]
+  }
+}
