@@ -37,6 +37,7 @@ const st = {
   density:     70,
   lensSize:    180,
   introActive: true,
+  introFound:  false,
   carouselIdx: 0,
 };
 
@@ -201,6 +202,7 @@ function initIntro() {
   // 시각 상태 초기화
   intro.removeAttribute('hidden');
   intro.style.cssText = '';
+  intro.classList.remove('found-menu');
   intro.querySelectorAll('.hero-clover, .twinkle, .found-msg, .intro-lucky-target, .intro-section-choice').forEach(el => el.remove());
   lens.classList.remove('found');
   lens.style.display = '';
@@ -212,6 +214,7 @@ function initIntro() {
   foundHint.style.display = '';
   foundHint.classList.remove('show');
   st.introActive = true;
+  st.introFound = false;
   jumpToPageTop();
 
   const greens = (PALETTES[st.paletteKey] || PALETTES.forest).greens;
@@ -270,6 +273,8 @@ function initIntro() {
   }
 
   function update(cx, cy) {
+    if (found) return;
+
     const r = intro.getBoundingClientRect();
     const localX = cx - r.left;
     const localY = cy - r.top;
@@ -284,7 +289,7 @@ function initIntro() {
     const dist   = Math.hypot(localX - fx, localY - fy);
     const inLens = dist < lensR + 18;
     const scale  = inLens ? 1.15 : 0.9;
-    const flOp   = found ? '0' : inLens ? '1' : '0';
+    const flOp   = inLens ? '1' : '0';
 
     luckyTarget.style.transform = `translate(-50%,-50%) rotate(${fourLeaf.rot}deg) scale(${scale})`;
     luckyTarget.style.opacity = flOp;
@@ -299,7 +304,11 @@ function initIntro() {
   }
 
   function onFound() {
+    if (found) return;
+
     found = true;
+    st.introFound = true;
+    intro.classList.add('found-menu');
     lens.classList.add('found');
     lens.style.display = 'none';
     fieldBw.classList.add('blurred');
@@ -328,31 +337,33 @@ function initIntro() {
     });
 
     function enterSection(targetId) {
-      intro.style.opacity       = '0';
-      intro.style.transition    = 'opacity .7s ease';
-      intro.style.pointerEvents = 'none';
-      setTimeout(() => {
-        intro.setAttribute('hidden', '');
-        st.introActive = false;
-        const target = document.getElementById(targetId);
-        const top = target ? target.offsetTop : 0;
-        window.scrollTo({ top, left: 0, behavior: 'instant' });
-      }, 700);
+      const target = document.getElementById(targetId);
+      const top = target ? target.offsetTop : 0;
+      intro.classList.add('passed-through');
+      st.introActive = false;
+      window.scrollTo({ top, left: 0, behavior: 'smooth' });
     }
 
     setTimeout(() => {
+      if (intro.querySelector('.intro-section-choice')) return;
+
       const nav = document.createElement('nav');
       nav.className = 'intro-section-choice';
       nav.setAttribute('aria-label', '섹션 선택');
       nav.innerHTML = `
-        <button class="leaf-choice leaf-choice-hope" type="button" data-target="leaf1"><span>01</span>Hope</button>
-        <button class="leaf-choice leaf-choice-faith" type="button" data-target="leaf2"><span>02</span>Faith</button>
-        <button class="leaf-choice leaf-choice-happiness" type="button" data-target="leaf3"><span>03</span>Happiness</button>
-        <button class="leaf-choice leaf-choice-luck" type="button" data-target="leaf4"><span>04</span>Luck</button>`;
-      nav.querySelectorAll('button').forEach(btn => {
-        btn.addEventListener('click', () => enterSection(btn.dataset.target));
+        <img class="intro-menu-clover" src="assets/lucky-four-clover.png" alt="">
+        <a class="leaf-choice leaf-choice-hope" href="#leaf1" data-target="leaf1"><span>01</span>Hope</a>
+        <a class="leaf-choice leaf-choice-faith" href="#leaf2" data-target="leaf2"><span>02</span>Faith</a>
+        <a class="leaf-choice leaf-choice-happiness" href="#leaf3" data-target="leaf3"><span>03</span>Happiness</a>
+        <a class="leaf-choice leaf-choice-luck" href="#leaf4" data-target="leaf4"><span>04</span>Luck</a>`;
+      nav.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', event => {
+          event.preventDefault();
+          enterSection(link.dataset.target);
+        });
       });
       intro.appendChild(nav);
+      luckyTarget.style.display = 'none';
     }, 760);
   }
 
