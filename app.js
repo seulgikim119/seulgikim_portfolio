@@ -458,7 +458,7 @@ function initProjectScroller() {
     const currentIndex = Math.floor(slideProgress);
     const nextIndex = Math.min(currentIndex + 1, maxIndex);
     const t = slideProgress - currentIndex;
-    const viewportCenter = track.parentElement.clientWidth / 2;
+    const viewportCenter = track.clientWidth / 2;
     const centers = slides.map(slide => slide.offsetLeft + slide.offsetWidth / 2 - viewportCenter);
     const start = centers[currentIndex] || 0;
     const end = centers[nextIndex] || start;

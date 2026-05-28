@@ -818,6 +818,18 @@ section.leaf + section.leaf { border-top: 1px solid var(--rule); }
   display: block;
 }
 
+.project-case-visual-fill {
+  padding: clamp(28px, 4vw, 48px);
+}
+
+.project-case-visual-fill img {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
 .project-visual-placeholder {
   width: min(76%, 360px);
   aspect-ratio: 3 / 5;
