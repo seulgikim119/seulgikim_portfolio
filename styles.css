@@ -1,4 +1,4 @@
-/* === Clover Portfolio — base styles === */
+﻿/* === Clover Portfolio — base styles === */
 :root {
   --bg: #f6f1e4;
   --bg-deep: #efe7d3;
@@ -14,6 +14,8 @@
   --rule: rgba(27,42,28,.14);
   --page-max: 1920px;
   --page-pad: clamp(24px, 8vw, 154px);
+  --section-pad-top: clamp(78px, 10vh, 120px);
+  --section-pad-bottom: clamp(32px, 6vh, 72px);
 }
 
 * { box-sizing: border-box; }
@@ -487,9 +489,12 @@ body { overflow-x: hidden; }
 
 section.leaf {
   position: relative;
+  width: 100%;
   height: 100vh;
+  height: 100dvh;
   max-height: 100vh;
-  padding: 120px var(--page-pad) 100px;
+  max-height: 100dvh;
+  padding: var(--section-pad-top) var(--page-pad) var(--section-pad-bottom);
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -502,8 +507,8 @@ section.leaf + section.leaf { border-top: 1px solid var(--rule); }
   align-items: flex-end;
   justify-content: space-between;
   gap: 40px;
-  margin-bottom: 40px;
-  padding-bottom: 24px;
+  margin-bottom: clamp(18px, 4vh, 40px);
+  padding-bottom: clamp(14px, 2.4vh, 24px);
   border-bottom: 1px solid var(--rule);
   flex-shrink: 0;
 }
@@ -516,7 +521,7 @@ section.leaf + section.leaf { border-top: 1px solid var(--rule); }
 .leaf-meta .num { color: var(--ink-mute); margin-right: 12px; }
 .leaf-title {
   font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Noto Sans KR', system-ui, sans-serif;
-  font-size: clamp(48px, 7vw, 84px);
+  font-size: clamp(42px, 7vh, 76px);
   line-height: 1.2;
   letter-spacing: -.02em;
   margin: 12px 0 0;
@@ -541,7 +546,7 @@ section.leaf + section.leaf { border-top: 1px solid var(--rule); }
 .about-grid {
   display: grid;
   grid-template-columns: 1fr 1.2fr;
-  gap: 80px;
+  gap: clamp(36px, 6vw, 80px);
   align-items: stretch;
   flex: 1;
   min-height: 0;
@@ -582,7 +587,7 @@ section.leaf + section.leaf { border-top: 1px solid var(--rule); }
   letter-spacing: -.005em;
   text-wrap: pretty;
   color: var(--ink);
-  margin: 0 0 36px;
+  margin: 0 0 clamp(18px, 3vh, 36px);
 }
 .about-lede em { color: var(--green-dark); }
 .about-body {
@@ -596,13 +601,13 @@ section.leaf + section.leaf { border-top: 1px solid var(--rule); }
 .about-body p + p { margin-top: 1em; }
 
 .facts {
-  margin-top: 48px;
+  margin-top: clamp(22px, 4vh, 48px);
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   border-top: 1px solid var(--rule);
 }
 .fact {
-  padding: 22px 24px;
+  padding: clamp(14px, 2.4vh, 22px) clamp(16px, 2vw, 24px);
   border-right: 1px solid var(--rule);
 }
 .fact:last-child { border-right: none; }
@@ -622,15 +627,15 @@ section.leaf + section.leaf { border-top: 1px solid var(--rule); }
 .resume-grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 30px;
-  margin-top: 40px;
-  padding-top: 32px;
+  gap: clamp(18px, 3vh, 30px);
+  margin-top: clamp(22px, 4vh, 40px);
+  padding-top: clamp(18px, 3vh, 32px);
   border-top: 1px solid var(--rule);
 }
 .resume-row {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 44px;
+  gap: clamp(24px, 4vw, 44px);
   align-items: start;
 }
 .resume-section { margin-bottom: 0; }
@@ -718,6 +723,7 @@ section.leaf + section.leaf { border-top: 1px solid var(--rule); }
 /* ── Projects (Leaf 2) ── */
 #leaf2 {
   height: 280vh;
+  height: 280dvh;
   max-height: none;
   padding: 0;
   overflow: visible;
@@ -730,8 +736,9 @@ section.leaf + section.leaf { border-top: 1px solid var(--rule); }
   top: 0;
   width: 100%;
   height: 100vh;
+  height: 100dvh;
   margin-left: 0;
-  padding: 96px var(--page-pad) 58px;
+  padding: clamp(76px, 9vh, 96px) var(--page-pad) clamp(30px, 5vh, 58px);
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -740,7 +747,7 @@ section.leaf + section.leaf { border-top: 1px solid var(--rule); }
 
 .project-sticky > .leaf-header {
   width: 100%;
-  margin-bottom: 28px;
+  margin-bottom: clamp(16px, 3vh, 28px);
 }
 
 .project-track {
@@ -769,13 +776,14 @@ section.leaf + section.leaf { border-top: 1px solid var(--rule); }
   height: 100%;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
-  gap: clamp(28px, 5vh, 62px);
+  gap: clamp(16px, 3vh, 38px);
+  min-height: 0;
 }
 
 .project-case-title {
   width: min(1020px, 100%);
   margin: 0 auto;
-  padding: clamp(24px, 3vw, 36px) clamp(28px, 4vw, 44px);
+  padding: clamp(16px, 2.4vh, 30px) clamp(24px, 4vw, 44px);
   background: #fff;
   border-radius: 36px;
   text-align: center;
@@ -784,7 +792,7 @@ section.leaf + section.leaf { border-top: 1px solid var(--rule); }
 .project-case-title h2 {
   margin: 0;
   color: #cf7f4b;
-  font-size: clamp(34px, 4vw, 56px);
+  font-size: clamp(28px, 5vh, 48px);
   font-weight: 800;
   line-height: 1.12;
   letter-spacing: 0;
@@ -801,7 +809,7 @@ section.leaf + section.leaf { border-top: 1px solid var(--rule); }
 .project-case-visual {
   min-height: 0;
   margin: 0;
-  padding: clamp(28px, 4vw, 48px);
+  padding: clamp(20px, 3vh, 40px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -819,7 +827,7 @@ section.leaf + section.leaf { border-top: 1px solid var(--rule); }
 }
 
 .project-case-visual-fill {
-  padding: clamp(28px, 4vw, 48px);
+  padding: clamp(20px, 3vh, 40px);
 }
 
 .project-case-visual-fill img {
@@ -842,14 +850,18 @@ section.leaf + section.leaf { border-top: 1px solid var(--rule); }
   min-height: 0;
   display: grid;
   grid-template-rows: auto auto minmax(0, 1fr);
-  gap: clamp(22px, 4vh, 46px);
+  gap: clamp(14px, 2.6vh, 30px);
 }
 
 .project-info-card {
-  padding: clamp(20px, 2.4vw, 28px);
+  min-height: 0;
+  padding: clamp(16px, 2.4vh, 24px);
   background: #fff;
   border-radius: 24px;
+  overflow: auto;
+  scrollbar-width: none;
 }
+.project-info-card::-webkit-scrollbar { display: none; }
 
 .project-info-card h3 {
   margin: 0 0 8px;
@@ -865,8 +877,8 @@ section.leaf + section.leaf { border-top: 1px solid var(--rule); }
   min-height: 1.6em;
   margin: 0;
   color: #595959;
-  font-size: 15px;
-  line-height: 1.6;
+  font-size: clamp(13px, 1.7vh, 15px);
+  line-height: 1.45;
   text-wrap: pretty;
 }
 
@@ -929,6 +941,27 @@ section.leaf + section.leaf { border-top: 1px solid var(--rule); }
 .project-links a:hover {
   transform: translateY(-2px);
   background: #b9693c;
+}
+
+#leaf3 {
+  height: 300vh;
+  height: 300dvh;
+  max-height: none;
+  padding: 0;
+  overflow: visible;
+}
+
+.happiness-sticky {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  padding: var(--section-pad-top) var(--page-pad) var(--section-pad-bottom);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: inherit;
 }
 
 .polaroid-stage {
@@ -1077,14 +1110,14 @@ section.leaf + section.leaf { border-top: 1px solid var(--rule); }
 .contact-wrap {
   display: grid;
   grid-template-columns: 1.1fr 1fr;
-  gap: 80px;
+  gap: clamp(36px, 6vw, 80px);
   align-items: start;
   flex: 1;
   min-height: 0;
 }
 .contact-statement {
   font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Noto Sans KR', system-ui, sans-serif;
-  font-size: 36px;
+  font-size: clamp(26px, 4.6vh, 36px);
   line-height: 1.2;
   text-wrap: balance;
   color: var(--ink);
@@ -1096,7 +1129,7 @@ section.leaf + section.leaf { border-top: 1px solid var(--rule); }
   grid-template-columns: 90px 1fr auto;
   align-items: center;
   gap: 24px;
-  padding: 22px 0;
+  padding: clamp(14px, 2.5vh, 22px) 0;
   border-top: 1px solid var(--rule);
   cursor: pointer;
   transition: padding .2s;
@@ -1113,7 +1146,7 @@ section.leaf + section.leaf { border-top: 1px solid var(--rule); }
 
 /* ── Footer ── */
 .foot {
-  padding: 60px var(--page-pad);
+  padding: clamp(30px, 5vh, 60px) var(--page-pad);
   border-top: 1px solid var(--rule);
   display: flex;
   justify-content: space-between;
@@ -1164,6 +1197,9 @@ section.leaf + section.leaf { border-top: 1px solid var(--rule); }
   .leaf-title { font-size: 56px; }
   .leaf-header { flex-direction: column; align-items: flex-start; }
   .leaf-kw { text-align: left; }
+  .happiness-sticky {
+    padding-top: 100px;
+  }
   .project-sticky {
     padding-top: 100px;
     overflow-y: auto;
@@ -1201,6 +1237,9 @@ section.leaf + section.leaf { border-top: 1px solid var(--rule); }
   .top-nav-badge { display: none; }
   .top-nav-menu { font-size: 12px; }
   .project-sticky {
+    padding: 92px 18px 34px;
+  }
+  .happiness-sticky {
     padding: 92px 18px 34px;
   }
   .project-sticky > .leaf-header {

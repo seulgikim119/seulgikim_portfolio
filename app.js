@@ -503,11 +503,51 @@ function initProjectScroller() {
 function initPolaroid() {
   const track = document.getElementById('polaroid-track');
   if (!track) return;
+  const section = track.closest('.leaf');
   const cards   = Array.from(track.querySelectorAll('.polaroid'));
   const dots    = Array.from(document.querySelectorAll('.pd-dot'));
   const counter = document.querySelector('.pd-count .serif');
   const total   = cards.length;
   const TILTS   = cards.map((_, i) => i * 37 % 11 - 5);
+
+  function goTo(index) {
+    const nextIndex = Math.max(0, Math.min(total - 1, index));
+    if (nextIndex === st.carouselIdx) return false;
+
+    st.carouselIdx = nextIndex;
+    render();
+    return true;
+  }
+
+  function canStep(direction) {
+    return direction < 0 ? st.carouselIdx > 0 : st.carouselIdx < total - 1;
+  }
+
+  function getScrollState() {
+    if (!section || total <= 1) {
+      return { progress: 0, scrollable: 1, sectionTop: 0 };
+    }
+
+    const sectionTop = section.offsetTop;
+    const scrollable = Math.max(section.offsetHeight - window.innerHeight, 1);
+    const raw = (window.scrollY - sectionTop) / scrollable;
+    const progress = Math.min(1, Math.max(0, raw));
+
+    return { progress, scrollable, sectionTop };
+  }
+
+  function syncWithScroll() {
+    const { progress } = getScrollState();
+    const nextIndex = Math.round(progress * Math.max(total - 1, 0));
+    goTo(nextIndex);
+  }
+
+  function scrollToIndex(index) {
+    const nextIndex = Math.max(0, Math.min(total - 1, index));
+    const { scrollable, sectionTop } = getScrollState();
+    const targetY = sectionTop + (nextIndex / Math.max(total - 1, 1)) * scrollable;
+    window.scrollTo({ top: targetY, left: 0, behavior: 'smooth' });
+  }
 
   function render() {
     cards.forEach((card, i) => {
@@ -530,12 +570,18 @@ function initPolaroid() {
   }
 
   document.querySelector('.polaroid-arrow.left')
-    ?.addEventListener('click', () => { if (st.carouselIdx > 0) { st.carouselIdx--; render(); } });
+    ?.addEventListener('click', () => { if (canStep(-1)) scrollToIndex(st.carouselIdx - 1); });
   document.querySelector('.polaroid-arrow.right')
-    ?.addEventListener('click', () => { if (st.carouselIdx < total - 1) { st.carouselIdx++; render(); } });
-  dots.forEach((dot, i) => dot.addEventListener('click', () => { st.carouselIdx = i; render(); }));
+    ?.addEventListener('click', () => { if (canStep(1)) scrollToIndex(st.carouselIdx + 1); });
+  dots.forEach((dot, i) => dot.addEventListener('click', () => { scrollToIndex(i); }));
 
   render();
+  syncWithScroll();
+  window.addEventListener('scroll', syncWithScroll, { passive: true });
+  window.addEventListener('resize', () => {
+    syncWithScroll();
+    render();
+  });
 }
 
 // ─── BOOT ────────────────────────────────────────────────────────────────────
