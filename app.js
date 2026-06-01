@@ -598,7 +598,7 @@ function initProjectLinks() {
     if (!href || href === '#' || link.getAttribute('aria-disabled') === 'true') return;
 
     const opened = window.open(link.href, '_blank', 'noopener,noreferrer');
-    if (!opened) window.location.assign(link.href);
+    if (opened) opened.focus();
   }, true);
 }
 
