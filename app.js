@@ -201,6 +201,7 @@ function initIntro() {
 
   // 시각 상태 초기화
   intro.removeAttribute('hidden');
+  intro.removeAttribute('aria-hidden');
   intro.style.cssText = '';
   intro.classList.remove('found-menu');
   intro.querySelectorAll('.hero-clover, .twinkle, .found-msg, .intro-lucky-target, .intro-section-choice').forEach(el => el.remove());
@@ -340,6 +341,7 @@ function initIntro() {
       const target = document.getElementById(targetId);
       const top = target ? target.offsetTop : 0;
       intro.classList.add('passed-through');
+      intro.setAttribute('aria-hidden', 'true');
       st.introActive = false;
       window.scrollTo({ top, left: 0, behavior: 'smooth' });
     }
@@ -352,10 +354,10 @@ function initIntro() {
       nav.setAttribute('aria-label', '섹션 선택');
       nav.innerHTML = `
         <img class="intro-menu-clover" src="assets/lucky-four-clover.png" alt="">
-        <a class="leaf-choice leaf-choice-hope" href="#leaf1" data-target="leaf1"><span>01</span>Hope</a>
-        <a class="leaf-choice leaf-choice-faith" href="#leaf2" data-target="leaf2"><span>02</span>Faith</a>
-        <a class="leaf-choice leaf-choice-happiness" href="#leaf3" data-target="leaf3"><span>03</span>Happiness</a>
-        <a class="leaf-choice leaf-choice-luck" href="#leaf4" data-target="leaf4"><span>04</span>Luck</a>`;
+        <a class="leaf-choice leaf-choice-hope" href="#leaf1" data-target="leaf1"><span>HOPE</span>나를 알아가기</a>
+        <a class="leaf-choice leaf-choice-faith" href="#leaf2" data-target="leaf2"><span>FAITH</span>경험 둘러보기</a>
+        <a class="leaf-choice leaf-choice-happiness" href="#leaf3" data-target="leaf3"><span>HAPPINESS</span>일상 들여다보기</a>
+        <a class="leaf-choice leaf-choice-luck" href="#leaf4" data-target="leaf4"><span>LUCK</span>제안하기</a>`;
       nav.querySelectorAll('a').forEach(link => {
         link.addEventListener('click', event => {
           event.preventDefault();
@@ -584,6 +586,22 @@ function initPolaroid() {
   });
 }
 
+function initProjectLinks() {
+  document.addEventListener('click', event => {
+    const link = event.target.closest('.project-links a');
+    if (!link) return;
+
+    const href = link.getAttribute('href');
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (!href || href === '#' || link.getAttribute('aria-disabled') === 'true') return;
+
+    const opened = window.open(link.href, '_blank', 'noopener,noreferrer');
+    if (!opened) window.location.assign(link.href);
+  }, true);
+}
+
 // ─── BOOT ────────────────────────────────────────────────────────────────────
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -592,5 +610,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initIntro();
   initTopNavAutoHide();
   initProjectScroller();
+  initProjectLinks();
   initPolaroid();
 });
