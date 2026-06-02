@@ -354,10 +354,10 @@ function initIntro() {
       nav.setAttribute('aria-label', '섹션 선택');
       nav.innerHTML = `
         <img class="intro-menu-clover" src="assets/lucky-four-clover.png" alt="">
-        <a class="leaf-choice leaf-choice-hope" href="#leaf1" data-target="leaf1"><span>HOPE</span><b>나를 알아가기</b></a>
-        <a class="leaf-choice leaf-choice-faith" href="#leaf2" data-target="leaf2"><span>FAITH</span><b>경험 둘러보기</b></a>
-        <a class="leaf-choice leaf-choice-happiness" href="#leaf3" data-target="leaf3"><span>HAPPINESS</span><b>일상 들여다보기</b></a>
-        <a class="leaf-choice leaf-choice-luck" href="#leaf4" data-target="leaf4"><span>LUCK</span><b>제안하기</b></a>`;
+        <a class="leaf-choice leaf-choice-hope" href="#leaf1" data-target="leaf1"><span>HOPE</span><b>Introduce</b></a>
+        <a class="leaf-choice leaf-choice-faith" href="#leaf2" data-target="leaf2"><span>FAITH</span><b>Projects</b></a>
+        <a class="leaf-choice leaf-choice-happiness" href="#leaf3" data-target="leaf3"><span>HAPPINESS</span><b>Lifestyle</b></a>
+        <a class="leaf-choice leaf-choice-luck" href="#leaf4" data-target="leaf4"><span>LUCK</span><b>Contact</b></a>`;
       nav.querySelectorAll('a').forEach(link => {
         link.addEventListener('click', event => {
           event.preventDefault();
