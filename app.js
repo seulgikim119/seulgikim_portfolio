@@ -439,30 +439,10 @@ function initProjectScroller() {
   const slides = Array.from(track.querySelectorAll('.project-slide'));
   const timelineItems = Array.from(section.querySelectorAll('.project-timeline-item'));
   const maxIndex = Math.max(slides.length - 1, 0);
-  let snapTimer = null;
-  let isSnapping = false;
-
-  function getProjectProgress() {
-    const sectionTop = section.offsetTop;
-    const scrollable = Math.max(section.offsetHeight - window.innerHeight, 1);
-    const raw = (window.scrollY - sectionTop) / scrollable;
-
-    return {
-      progress: Math.min(1, Math.max(0, raw)),
-      scrollable,
-      sectionTop,
-      isInside: raw >= 0 && raw <= 1,
-    };
-  }
+  let activeIndex = 0;
 
   function render() {
-    const { progress } = getProjectProgress();
-    const slideProgress = progress * maxIndex;
-    const currentIndex = Math.floor(slideProgress);
-    const nextIndex = Math.min(currentIndex + 1, maxIndex);
-    const activeIndex = Math.round(slideProgress);
-    const t = slideProgress - currentIndex;
-    const x = (currentIndex + (nextIndex - currentIndex) * t) * track.clientWidth;
+    const x = activeIndex * track.clientWidth;
     slides.forEach((slide, index) => {
       const isActive = index === activeIndex;
       slide.classList.toggle('is-active', isActive);
@@ -478,54 +458,19 @@ function initProjectScroller() {
     });
   }
 
-  function scrollToProject(index) {
+  function showProject(index) {
     if (maxIndex === 0) return;
-    const nextIndex = Math.max(0, Math.min(maxIndex, index));
-    const { scrollable, sectionTop } = getProjectProgress();
-    const targetY = sectionTop + (nextIndex / maxIndex) * scrollable;
-    isSnapping = true;
-    window.scrollTo({ top: targetY, behavior: 'smooth' });
-    window.setTimeout(() => {
-      isSnapping = false;
-      render();
-    }, 520);
-  }
-
-  function snapToNearestSlide() {
-    if (maxIndex === 0 || isSnapping) return;
-
-    const { progress, scrollable, sectionTop, isInside } = getProjectProgress();
-    if (!isInside) return;
-
-    const nearestIndex = Math.round(progress * maxIndex);
-    const targetY = sectionTop + (nearestIndex / maxIndex) * scrollable;
-    if (Math.abs(window.scrollY - targetY) < 2) return;
-
-    isSnapping = true;
-    window.scrollTo({ top: targetY, behavior: 'smooth' });
-    window.setTimeout(() => {
-      isSnapping = false;
-      render();
-    }, 520);
-  }
-
-  function queueSnap() {
-    if (isSnapping) return;
-    window.clearTimeout(snapTimer);
-    snapTimer = window.setTimeout(snapToNearestSlide, 150);
+    activeIndex = Math.max(0, Math.min(maxIndex, index));
+    render();
   }
 
   timelineItems.forEach(button => {
     button.addEventListener('click', () => {
-      scrollToProject(Number(button.dataset.projectIndex || 0));
+      showProject(Number(button.dataset.projectIndex || 0));
     });
   });
 
   render();
-  window.addEventListener('scroll', () => {
-    render();
-    queueSnap();
-  }, { passive: true });
   window.addEventListener('resize', render);
 }
 
@@ -534,7 +479,6 @@ function initProjectScroller() {
 function initPolaroid() {
   const track = document.getElementById('polaroid-track');
   if (!track) return;
-  const section = track.closest('.leaf');
   const cards   = Array.from(track.querySelectorAll('.polaroid'));
   const dots    = Array.from(document.querySelectorAll('.pd-dot'));
   const counter = document.querySelector('.pd-count .serif');
@@ -554,38 +498,12 @@ function initPolaroid() {
     return direction < 0 ? st.carouselIdx > 0 : st.carouselIdx < total - 1;
   }
 
-  function getScrollState() {
-    if (!section || total <= 1) {
-      return { progress: 0, scrollable: 1, sectionTop: 0 };
-    }
-
-    const sectionTop = section.offsetTop;
-    const scrollable = Math.max(section.offsetHeight - window.innerHeight, 1);
-    const raw = (window.scrollY - sectionTop) / scrollable;
-    const progress = Math.min(1, Math.max(0, raw));
-
-    return { progress, scrollable, sectionTop };
-  }
-
-  function syncWithScroll() {
-    const { progress } = getScrollState();
-    const nextIndex = Math.round(progress * Math.max(total - 1, 0));
-    goTo(nextIndex);
-  }
-
-  function scrollToIndex(index) {
-    const nextIndex = Math.max(0, Math.min(total - 1, index));
-    const { scrollable, sectionTop } = getScrollState();
-    const targetY = sectionTop + (nextIndex / Math.max(total - 1, 1)) * scrollable;
-    window.scrollTo({ top: targetY, left: 0, behavior: 'smooth' });
-  }
-
   function render() {
     cards.forEach((card, i) => {
       const offset   = i - st.carouselIdx;
       const isCenter = offset === 0;
-      const centerScale = window.innerWidth <= 720 ? 1.18 : 1.5;
-      const sideGap = window.innerWidth <= 720 ? 300 : 470;
+      const centerScale = window.innerWidth <= 720 ? 1.08 : 1.32;
+      const sideGap = window.innerWidth <= 720 ? 240 : 390;
       const x   = offset * sideGap;
       const rot = TILTS[i] + (isCenter ? 0 : offset < 0 ? -6 : 6);
       card.style.transform  = `translate(-50%, -50%) translateX(${x}px) rotate(${rot}deg) scale(${isCenter ? centerScale : 0.78})`;
@@ -601,16 +519,13 @@ function initPolaroid() {
   }
 
   document.querySelector('.polaroid-arrow.left')
-    ?.addEventListener('click', () => { if (canStep(-1)) scrollToIndex(st.carouselIdx - 1); });
+    ?.addEventListener('click', () => { if (canStep(-1)) goTo(st.carouselIdx - 1); });
   document.querySelector('.polaroid-arrow.right')
-    ?.addEventListener('click', () => { if (canStep(1)) scrollToIndex(st.carouselIdx + 1); });
-  dots.forEach((dot, i) => dot.addEventListener('click', () => { scrollToIndex(i); }));
+    ?.addEventListener('click', () => { if (canStep(1)) goTo(st.carouselIdx + 1); });
+  dots.forEach((dot, i) => dot.addEventListener('click', () => { goTo(i); }));
 
   render();
-  syncWithScroll();
-  window.addEventListener('scroll', syncWithScroll, { passive: true });
   window.addEventListener('resize', () => {
-    syncWithScroll();
     render();
   });
 }
