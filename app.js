@@ -440,6 +440,7 @@ function initProjectScroller() {
   const timelineItems = Array.from(section.querySelectorAll('.project-timeline-item'));
   const maxIndex = Math.max(slides.length - 1, 0);
   let activeIndex = 0;
+  let wheelLocked = false;
 
   function render() {
     const x = activeIndex * track.clientWidth;
@@ -464,12 +465,33 @@ function initProjectScroller() {
     render();
   }
 
+  function canStepProject(direction) {
+    return direction > 0 ? activeIndex < maxIndex : activeIndex > 0;
+  }
+
+  function onProjectWheel(event) {
+    if (Math.abs(event.deltaY) < 8) return;
+
+    const direction = event.deltaY > 0 ? 1 : -1;
+    if (!canStepProject(direction)) return;
+
+    event.preventDefault();
+    if (wheelLocked) return;
+
+    wheelLocked = true;
+    showProject(activeIndex + direction);
+    window.setTimeout(() => {
+      wheelLocked = false;
+    }, 520);
+  }
+
   timelineItems.forEach(button => {
     button.addEventListener('click', () => {
       showProject(Number(button.dataset.projectIndex || 0));
     });
   });
 
+  section.addEventListener('wheel', onProjectWheel, { passive: false });
   render();
   window.addEventListener('resize', render);
 }
@@ -479,11 +501,13 @@ function initProjectScroller() {
 function initPolaroid() {
   const track = document.getElementById('polaroid-track');
   if (!track) return;
+  const section = track.closest('.leaf');
   const cards   = Array.from(track.querySelectorAll('.polaroid'));
   const dots    = Array.from(document.querySelectorAll('.pd-dot'));
   const counter = document.querySelector('.pd-count .serif');
   const total   = cards.length;
   const TILTS   = cards.map((_, i) => i * 37 % 11 - 5);
+  let wheelLocked = false;
 
   function goTo(index) {
     const nextIndex = Math.max(0, Math.min(total - 1, index));
@@ -498,12 +522,28 @@ function initPolaroid() {
     return direction < 0 ? st.carouselIdx > 0 : st.carouselIdx < total - 1;
   }
 
+  function onPolaroidWheel(event) {
+    if (Math.abs(event.deltaY) < 8) return;
+
+    const direction = event.deltaY > 0 ? 1 : -1;
+    if (!canStep(direction)) return;
+
+    event.preventDefault();
+    if (wheelLocked) return;
+
+    wheelLocked = true;
+    goTo(st.carouselIdx + direction);
+    window.setTimeout(() => {
+      wheelLocked = false;
+    }, 520);
+  }
+
   function render() {
     cards.forEach((card, i) => {
       const offset   = i - st.carouselIdx;
       const isCenter = offset === 0;
-      const centerScale = window.innerWidth <= 720 ? 1.08 : 1.32;
-      const sideGap = window.innerWidth <= 720 ? 240 : 390;
+      const centerScale = window.innerWidth <= 720 ? 1.04 : window.innerWidth <= 1280 ? 1.22 : 1.34;
+      const sideGap = window.innerWidth <= 720 ? 230 : window.innerWidth <= 1280 ? 360 : 430;
       const x   = offset * sideGap;
       const rot = TILTS[i] + (isCenter ? 0 : offset < 0 ? -6 : 6);
       card.style.transform  = `translate(-50%, -50%) translateX(${x}px) rotate(${rot}deg) scale(${isCenter ? centerScale : 0.78})`;
@@ -524,6 +564,7 @@ function initPolaroid() {
     ?.addEventListener('click', () => { if (canStep(1)) goTo(st.carouselIdx + 1); });
   dots.forEach((dot, i) => dot.addEventListener('click', () => { goTo(i); }));
 
+  section?.addEventListener('wheel', onPolaroidWheel, { passive: false });
   render();
   window.addEventListener('resize', () => {
     render();
