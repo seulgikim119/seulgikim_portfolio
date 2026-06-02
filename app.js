@@ -437,6 +437,7 @@ function initProjectScroller() {
   if (!section || !track) return;
 
   const slides = Array.from(track.querySelectorAll('.project-slide'));
+  const timelineItems = Array.from(section.querySelectorAll('.project-timeline-item'));
   const maxIndex = Math.max(slides.length - 1, 0);
   let snapTimer = null;
   let isSnapping = false;
@@ -459,13 +460,35 @@ function initProjectScroller() {
     const slideProgress = progress * maxIndex;
     const currentIndex = Math.floor(slideProgress);
     const nextIndex = Math.min(currentIndex + 1, maxIndex);
+    const activeIndex = Math.round(slideProgress);
     const t = slideProgress - currentIndex;
-    const viewportCenter = track.clientWidth / 2;
-    const centers = slides.map(slide => slide.offsetLeft + slide.offsetWidth / 2 - viewportCenter);
-    const start = centers[currentIndex] || 0;
-    const end = centers[nextIndex] || start;
-    const x = start + (end - start) * t;
+    const x = (currentIndex + (nextIndex - currentIndex) * t) * track.clientWidth;
+    slides.forEach((slide, index) => {
+      const isActive = index === activeIndex;
+      slide.classList.toggle('is-active', isActive);
+      slide.setAttribute('aria-hidden', String(!isActive));
+    });
     track.style.transform = `translate3d(${-x}px, 0, 0)`;
+    updateProjectState(activeIndex);
+  }
+
+  function updateProjectState(activeIndex) {
+    timelineItems.forEach((item, index) => {
+      item.classList.toggle('is-active', index === activeIndex);
+    });
+  }
+
+  function scrollToProject(index) {
+    if (maxIndex === 0) return;
+    const nextIndex = Math.max(0, Math.min(maxIndex, index));
+    const { scrollable, sectionTop } = getProjectProgress();
+    const targetY = sectionTop + (nextIndex / maxIndex) * scrollable;
+    isSnapping = true;
+    window.scrollTo({ top: targetY, behavior: 'smooth' });
+    window.setTimeout(() => {
+      isSnapping = false;
+      render();
+    }, 520);
   }
 
   function snapToNearestSlide() {
@@ -491,6 +514,12 @@ function initProjectScroller() {
     window.clearTimeout(snapTimer);
     snapTimer = window.setTimeout(snapToNearestSlide, 150);
   }
+
+  timelineItems.forEach(button => {
+    button.addEventListener('click', () => {
+      scrollToProject(Number(button.dataset.projectIndex || 0));
+    });
+  });
 
   render();
   window.addEventListener('scroll', () => {
