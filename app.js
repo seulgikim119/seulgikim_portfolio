@@ -443,13 +443,12 @@ function initProjectScroller() {
   let wheelLocked = false;
 
   function render() {
-    const x = activeIndex * track.clientWidth;
     slides.forEach((slide, index) => {
       const isActive = index === activeIndex;
       slide.classList.toggle('is-active', isActive);
       slide.setAttribute('aria-hidden', String(!isActive));
+      slide.style.transform = `translate3d(${(index - activeIndex) * 100}%, 0, 0)`;
     });
-    track.style.transform = `translate3d(${-x}px, 0, 0)`;
     updateProjectState(activeIndex);
   }
 
