@@ -1514,14 +1514,14 @@ section.leaf + section.leaf { border-top: 1px solid var(--rule); }
 
 .project-timeline {
   position: absolute;
-  left: var(--page-pad);
-  right: var(--page-pad);
+  left: 50%;
   bottom: clamp(8px, 1.2vh, 12px);
   z-index: 10;
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: clamp(10px, 2vw, 22px);
   align-items: stretch;
+  width: min(1500px, calc(100% - (var(--page-pad) * 2)));
   padding: 26px clamp(12px, 2vw, 20px) 10px;
   border: 1px solid rgba(27, 42, 28, .08);
   border-radius: 22px;
@@ -1529,6 +1529,7 @@ section.leaf + section.leaf { border-top: 1px solid var(--rule); }
   box-shadow: 0 18px 42px -34px rgba(27, 42, 28, .4);
   backdrop-filter: blur(12px);
   color: rgba(27, 42, 28, .46);
+  transform: translateX(-50%);
 }
 
 .project-timeline::before {
@@ -2100,8 +2101,9 @@ section.leaf + section.leaf { border-top: 1px solid var(--rule); }
     gap: 10px;
   }
   .project-timeline {
-    left: var(--page-pad);
-    right: var(--page-pad);
+    left: 50%;
+    right: auto;
+    width: min(100%, calc(100% - (var(--page-pad) * 2)));
     bottom: clamp(8px, 1.4vh, 14px);
     gap: 8px;
   }
@@ -2217,6 +2219,8 @@ section.leaf + section.leaf { border-top: 1px solid var(--rule); }
     left: auto;
     right: auto;
     bottom: auto;
+    width: 100%;
+    transform: none;
     margin-top: 12px;
     padding: 24px 6px 8px;
     border-radius: 18px;
