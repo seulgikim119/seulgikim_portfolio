@@ -28,20 +28,6 @@
     <div class="lens" id="lens"></div>
   </div>
 
-  <!-- ── Top Nav ──────────────────────────────────────────────── -->
-  <header class="top-nav" aria-label="주요 메뉴">
-    <a class="top-nav-brand" href="#leaf1" aria-label="처음 섹션으로 이동">
-      <span>김슬기 Portfolio</span>
-    </a>
-    <nav class="top-nav-menu" aria-label="섹션 이동">
-      <a href="#leaf1">소개</a>
-      <a href="#leaf2">프로젝트</a>
-      <a href="#leaf3">기록</a>
-      <a href="#leaf4">연락하기</a>
-    </nav>
-    <div class="top-nav-badge">PORTFOLIO 2026</div>
-  </header>
-
   <!-- ── App ──────────────────────────────────────────────────── -->
   <div class="app">
 
@@ -476,6 +462,24 @@
           "좋은 디자인은 좋은 동료에서 시작된다"고 생각합니다.<br>
           데이터 뒤에 사람을 보고, 클라이언트 뒤에 사용자를 보는 그런 팀을 만나기를 기대하고 있습니다
         </div>
+        <form class="contact-form" action="https://formspree.io/f/maqkrddb" method="POST">
+          <input type="hidden" name="_subject" value="Portfolio contact from seulgikim">
+          <div class="contact-form-grid">
+            <label>
+              <span>NAME</span>
+              <input type="text" name="name" autocomplete="name" required>
+            </label>
+            <label>
+              <span>EMAIL</span>
+              <input type="email" name="email" autocomplete="email" required>
+            </label>
+          </div>
+          <label>
+            <span>MESSAGE</span>
+            <textarea name="message" required></textarea>
+          </label>
+          <button type="submit">Send Message</button>
+        </form>
       </div>
     </section>
 

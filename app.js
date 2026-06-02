@@ -388,49 +388,6 @@ function initIntro() {
 
 // ─── PROJECT SCROLL ──────────────────────────────────────────────────────────
 
-function initTopNavAutoHide() {
-  const nav = document.querySelector('.top-nav');
-  if (!nav) return;
-
-  let lastY = window.scrollY;
-  const minDelta = 6;
-  const topBuffer = 24;
-  const revealDistance = 48;
-  let upwardDistance = 0;
-
-  function reveal() {
-    nav.classList.remove('nav-hidden');
-  }
-
-  function onScroll() {
-    const currentY = window.scrollY;
-    const delta = currentY - lastY;
-
-    if (currentY <= topBuffer) {
-      reveal();
-      lastY = currentY;
-      upwardDistance = 0;
-      return;
-    }
-
-    if (Math.abs(delta) < minDelta) return;
-
-    if (delta > 0) {
-      upwardDistance = 0;
-      nav.classList.add('nav-hidden');
-    } else {
-      upwardDistance += Math.abs(delta);
-      if (upwardDistance >= revealDistance) reveal();
-    }
-
-    lastY = currentY;
-  }
-
-  window.addEventListener('scroll', onScroll, { passive: true });
-  nav.addEventListener('focusin', reveal);
-  nav.addEventListener('mouseenter', reveal);
-}
-
 function initProjectScroller() {
   const section = document.getElementById('leaf2');
   const track = document.getElementById('project-track');
@@ -637,7 +594,6 @@ document.addEventListener('DOMContentLoaded', () => {
   applyPaletteVars(st.paletteKey);
   initCornerClovers();
   initIntro();
-  initTopNavAutoHide();
   initProjectScroller();
   initProjectLinks();
   initPhotoScatterModal();
