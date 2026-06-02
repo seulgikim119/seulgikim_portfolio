@@ -58,8 +58,20 @@
         <div class="deco-clover tl"></div><!-- JS가 SVG 삽입 -->
       </header>
       <div class="about-grid">
-        <div class="about-portrait grain">
-          <div class="stripe"></div>
+        <div class="about-portrait">
+          <div class="stripe photo-scatter" aria-label="사진 모아보기">
+            <div class="photo-scatter-board">
+              <button class="scatter-photo scatter-photo-1 scatter-photo-main" type="button" data-full="assets/warm-pink.jpg" data-caption="Profile">
+                <img src="assets/warm-pink.jpg" alt="프로필 사진">
+              </button>
+              <button class="scatter-photo scatter-photo-2" type="button" data-full="assets/team-work.png" data-caption="Team Work">
+                <img src="assets/team-work.png" alt="팀원들과 작업 중인 사진">
+              </button>
+              <button class="scatter-photo scatter-photo-3" type="button" data-full="assets/team-review.png" data-caption="Review">
+                <img src="assets/team-review.png" alt="팀원들과 화면을 보며 리뷰하는 사진">
+              </button>
+            </div>
+          </div>
           <div class="ph-label">portrait<br>3:4 photograph</div>
         </div>
         <div class="about-content">
@@ -90,6 +102,10 @@
             <div class="resume-row">
               <div class="resume-section">
                 <div class="resume-heading">Education</div>
+                <div class="resume-item">
+                  <div class="resume-year">2025.12<br>~2026.06</div>
+                  <div>이젠아카데미<br>UXUI디자인&웹기획 프론트엔드 부트캠프 수료</div>
+                </div>
                 <div class="resume-item">
                   <div class="resume-year">2017.03<br>~2019.02</div>
                   <div>한국영상대학교<br>실용음악과 졸업</div>
@@ -372,7 +388,7 @@
             <div class="polaroid-caption">
               <div class="pc-title serif">여행</div>
               <div class="pc-sub">Travel & Wander</div>
-              <div class="pc-sub">지도에 저장해 둔 장소들을 정리하고 동선을 짜다 보면 여행 전부터 설레는 기분이 들어 자주 떠나곤 합니다.</div>
+              <div class="pc-sub">지도에 저장해 둔 장소들을 정리하고 동선을 짜다 보면 <br>여행 전부터 설레는 기분이 들어 자주 떠나곤 합니다.</div>
             </div>
           </article>
 
@@ -385,7 +401,7 @@
             <div class="polaroid-caption">
               <div class="pc-title serif">사진촬영</div>
               <div class="pc-sub">Photography</div>
-              <div class="pc-sub">그날의 분위기나 기억하고 싶은 순간들을 기록하는 것을 좋아해서 여행을 갈 때면 자연스럽게 카메라를 들게 됩니다.</div>
+              <div class="pc-sub">그날의 분위기나 기억하고 싶은 순간들을 기록하는 것을 <br>좋아해서 여행을 갈 때면 자연스럽게 카메라를 들게 됩니다.</div>
             </div>
           </article>
 
@@ -449,6 +465,14 @@
     </footer>
 
   </div><!-- /.app -->
+
+  <div class="photo-modal" id="photo-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-label="사진 확대 보기">
+    <button class="photo-modal-close" type="button" aria-label="닫기">×</button>
+    <figure class="photo-modal-frame">
+      <img id="photo-modal-img" src="" alt="">
+      <figcaption id="photo-modal-caption"></figcaption>
+    </figure>
+  </div>
 
   <script src="app.js"></script>
 </body>

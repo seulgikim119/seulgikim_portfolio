@@ -354,10 +354,10 @@ function initIntro() {
       nav.setAttribute('aria-label', '섹션 선택');
       nav.innerHTML = `
         <img class="intro-menu-clover" src="assets/lucky-four-clover.png" alt="">
-        <a class="leaf-choice leaf-choice-hope" href="#leaf1" data-target="leaf1"><span>HOPE</span>나를 알아가기</a>
-        <a class="leaf-choice leaf-choice-faith" href="#leaf2" data-target="leaf2"><span>FAITH</span>경험 둘러보기</a>
-        <a class="leaf-choice leaf-choice-happiness" href="#leaf3" data-target="leaf3"><span>HAPPINESS</span>일상 들여다보기</a>
-        <a class="leaf-choice leaf-choice-luck" href="#leaf4" data-target="leaf4"><span>LUCK</span>제안하기</a>`;
+        <a class="leaf-choice leaf-choice-hope" href="#leaf1" data-target="leaf1"><span>HOPE</span><b>나를 알아가기</b></a>
+        <a class="leaf-choice leaf-choice-faith" href="#leaf2" data-target="leaf2"><span>FAITH</span><b>경험 둘러보기</b></a>
+        <a class="leaf-choice leaf-choice-happiness" href="#leaf3" data-target="leaf3"><span>HAPPINESS</span><b>일상 들여다보기</b></a>
+        <a class="leaf-choice leaf-choice-luck" href="#leaf4" data-target="leaf4"><span>LUCK</span><b>제안하기</b></a>`;
       nav.querySelectorAll('a').forEach(link => {
         link.addEventListener('click', event => {
           event.preventDefault();
@@ -604,6 +604,51 @@ function initProjectLinks() {
 
 // ─── BOOT ────────────────────────────────────────────────────────────────────
 
+function initPhotoScatterModal() {
+  const modal = document.getElementById('photo-modal');
+  const modalImg = document.getElementById('photo-modal-img');
+  const modalCaption = document.getElementById('photo-modal-caption');
+  const closeBtn = modal?.querySelector('.photo-modal-close');
+  const photoButtons = document.querySelectorAll('.scatter-photo');
+  if (!modal || !modalImg || !modalCaption || !closeBtn || !photoButtons.length) return;
+
+  let lastFocus = null;
+
+  function closeModal() {
+    modal.classList.remove('is-open');
+    modal.setAttribute('aria-hidden', 'true');
+    modalImg.removeAttribute('src');
+    modalImg.alt = '';
+    if (lastFocus) lastFocus.focus();
+  }
+
+  function openModal(button) {
+    const img = button.querySelector('img');
+    const src = button.dataset.full || img?.currentSrc || img?.src;
+    if (!src) return;
+
+    lastFocus = button;
+    modalImg.src = src;
+    modalImg.alt = img?.alt || '';
+    modalCaption.textContent = button.dataset.caption || '';
+    modal.classList.add('is-open');
+    modal.setAttribute('aria-hidden', 'false');
+    closeBtn.focus();
+  }
+
+  photoButtons.forEach(button => {
+    button.addEventListener('click', () => openModal(button));
+  });
+
+  closeBtn.addEventListener('click', closeModal);
+  modal.addEventListener('click', event => {
+    if (event.target === modal) closeModal();
+  });
+  window.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && modal.classList.contains('is-open')) closeModal();
+  });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   applyPaletteVars(st.paletteKey);
   initCornerClovers();
@@ -611,5 +656,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initTopNavAutoHide();
   initProjectScroller();
   initProjectLinks();
+  initPhotoScatterModal();
   initPolaroid();
 });
