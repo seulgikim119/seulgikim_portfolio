@@ -1719,6 +1719,102 @@ section.leaf + section.leaf { border-top: 1px solid var(--rule); }
   object-position: center;
 }
 
+.polaroid-photography {
+  z-index: 6;
+}
+
+.photo-hover-cloud {
+  position: absolute;
+  inset: -18% -46%;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.polaroid-photography .polaroid-tape,
+.polaroid-photography .polaroid-photo,
+.polaroid-photography .polaroid-caption {
+  position: relative;
+  z-index: 2;
+}
+
+.photo-hover-item {
+  position: absolute;
+  width: clamp(74px, 8vw, 124px);
+  aspect-ratio: 4 / 5.2;
+  padding: 5px 5px 15px;
+  border: 1px solid rgba(27, 42, 28, .1);
+  background: #fbf7eb;
+  box-shadow: 0 18px 34px -24px rgba(27, 42, 28, .55);
+  object-fit: cover;
+  opacity: 0;
+  filter: saturate(.98) brightness(1.03);
+  transform: translate3d(0, 10px, 0) scale(.82) rotate(var(--rot));
+  transition: opacity .28s ease, transform .45s cubic-bezier(.18, .8, .24, 1);
+}
+
+.polaroid-photography:hover .photo-hover-item,
+.polaroid-photography:focus-within .photo-hover-item {
+  opacity: .96;
+  transform: translate3d(var(--x), var(--y), 0) scale(1) rotate(var(--rot));
+  animation: photoFloat 4.8s ease-in-out infinite;
+  animation-delay: var(--delay);
+}
+
+.photo-hover-1 {
+  left: 2%;
+  top: 8%;
+  --x: -118%;
+  --y: -36%;
+  --rot: -9deg;
+  --delay: 0s;
+}
+
+.photo-hover-2 {
+  right: 4%;
+  top: 2%;
+  --x: 112%;
+  --y: -30%;
+  --rot: 8deg;
+  --delay: -.7s;
+}
+
+.photo-hover-3 {
+  left: 0;
+  bottom: 12%;
+  --x: -128%;
+  --y: 34%;
+  --rot: 7deg;
+  --delay: -1.3s;
+}
+
+.photo-hover-4 {
+  right: 2%;
+  bottom: 14%;
+  --x: 124%;
+  --y: 30%;
+  --rot: -7deg;
+  --delay: -2s;
+}
+
+.photo-hover-5 {
+  left: 50%;
+  top: -6%;
+  width: clamp(64px, 7vw, 104px);
+  --x: -50%;
+  --y: -92%;
+  --rot: 4deg;
+  --delay: -2.7s;
+}
+
+@keyframes photoFloat {
+  0%, 100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -12px;
+  }
+}
+
 .polaroid-caption { padding: 4px 4px 0; text-align: center; }
 .pc-title { font-size: clamp(20px, 2.5vh, 24px); line-height: 1.2; color: var(--ink); margin-bottom: 4px; letter-spacing: -.005em; }
 .pc-sub { font-size: 10px; letter-spacing: .18em; text-transform: uppercase; color: var(--gold-deep); margin-bottom: 9px; }
