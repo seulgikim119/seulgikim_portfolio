@@ -23,13 +23,6 @@ const PALETTES = {
   },
 };
 
-const CORNER_CLOVERS = [
-  { section: 'leaf1', leaves: 1, rot: -15, size: 90 },
-  { section: 'leaf2', leaves: 2, rot: -15, size: 90 },
-  { section: 'leaf3', leaves: 3, rot: -15, size: 90 },
-  { section: 'leaf4', leaves: 4, rot: -15, size: 90 },
-];
-
 // ─── STATE ───────────────────────────────────────────────────────────────────
 
 const st = {
@@ -40,6 +33,93 @@ const st = {
   introFound:  false,
   carouselIdx: 0,
 };
+
+function getScrollBehavior(behavior) {
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : behavior;
+}
+
+function createRafRunner(fn) {
+  let ticking = false;
+
+  return function runOnFrame() {
+    if (ticking) return;
+    ticking = true;
+    window.requestAnimationFrame(() => {
+      ticking = false;
+      fn();
+    });
+  };
+}
+
+const REVEAL_SELECTOR = [
+  '.about-portrait',
+  '.about-content',
+  '.project-case-title',
+  '.project-case-visual',
+  '.project-info-card',
+  '.project-timeline-item',
+  '.polaroid',
+  '.polaroid-dots',
+  '.contact-statement',
+  '.contact-kicker',
+  '.contact-mark',
+  '.contact-title',
+  '.contact-lede',
+  '.contact-qa',
+  '.contact-form',
+].join(',');
+
+function revealItems(items, options = {}) {
+  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const baseDelay = options.baseDelay || 0;
+  const stepDelay = prefersReducedMotion ? 0 : (options.stepDelay || 110);
+
+  items.forEach((item, index) => {
+    item.style.setProperty('--reveal-delay', `${baseDelay + index * stepDelay}ms`);
+    item.classList.add('is-visible');
+  });
+}
+
+function resetRevealItems(items) {
+  items.forEach(item => {
+    item.classList.remove('is-visible');
+    item.style.removeProperty('--reveal-delay');
+  });
+}
+
+function appendIntroSectionChoice(intro, onSelect) {
+  if (!intro || intro.querySelector('.intro-section-choice')) return;
+
+  const nav = document.createElement('nav');
+  nav.className = 'intro-section-choice';
+  nav.setAttribute('aria-label', '섹션 선택');
+  nav.innerHTML = `
+    <img class="intro-menu-clover" src="assets/lucky-four-clover.png" alt="">
+    <a class="leaf-choice leaf-choice-hope" href="#leaf1" data-target="leaf1"><span>HOPE</span><b>Introduce</b></a>
+    <a class="leaf-choice leaf-choice-faith" href="#leaf2" data-target="leaf2"><span>FAITH</span><b>Projects</b></a>
+    <a class="leaf-choice leaf-choice-happiness" href="#leaf3" data-target="leaf3"><span>HAPPINESS</span><b>Lifestyle</b></a>
+    <a class="leaf-choice leaf-choice-luck" href="#leaf4" data-target="leaf4"><span>LUCK</span><b>Contact</b></a>`;
+
+  nav.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', event => {
+      event.preventDefault();
+      onSelect(link.dataset.target);
+    });
+  });
+
+  intro.appendChild(nav);
+}
+
+function enterSectionFromIntro(targetId) {
+  const intro = document.getElementById('intro');
+  const target = document.getElementById(targetId);
+  const top = target ? target.offsetTop : 0;
+
+  intro?.classList.add('passed-through');
+  intro?.setAttribute('aria-hidden', 'true');
+  st.introActive = false;
+  window.scrollTo({ top, left: 0, behavior: getScrollBehavior('smooth') });
+}
 
 // ─── UTILITIES ───────────────────────────────────────────────────────────────
 
@@ -116,15 +196,6 @@ function cloverCSSHTML({ size, leaves = 3, lucky = false }) {
 
 // ─── CORNER CLOVERS ──────────────────────────────────────────────────────────
 
-function initCornerClovers() {
-  CORNER_CLOVERS.forEach(({ section, leaves, rot, size }) => {
-    const el = document.querySelector(`#${section} .deco-clover`);
-    if (!el) return;
-    el.style.transform = `rotate(${rot}deg)`;
-    el.innerHTML = cloverCSSHTML({ size, leaves, lucky: leaves === 4 });
-  });
-}
-
 // ─── INTRO ───────────────────────────────────────────────────────────────────
 
 function generateIntroData(density) {
@@ -193,10 +264,11 @@ function initIntro() {
   const sparkle    = document.getElementById('sparkle');
   const foundHint  = document.getElementById('found-hint');
   const lens       = document.getElementById('lens');
+  if (!intro || !fieldBw || !fieldColor || !sparkle || !foundHint || !lens) return;
 
   function jumpToPageTop() {
-    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-    requestAnimationFrame(() => window.scrollTo({ top: 0, left: 0, behavior: 'instant' }));
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    requestAnimationFrame(() => window.scrollTo({ top: 0, left: 0, behavior: 'auto' }));
   }
 
   // 시각 상태 초기화
@@ -337,39 +409,16 @@ function initIntro() {
       });
     });
 
-    function enterSection(targetId) {
-      const target = document.getElementById(targetId);
-      const top = target ? target.offsetTop : 0;
-      intro.classList.add('passed-through');
-      intro.setAttribute('aria-hidden', 'true');
-      st.introActive = false;
-      window.scrollTo({ top, left: 0, behavior: 'smooth' });
-    }
-
     setTimeout(() => {
       if (intro.querySelector('.intro-section-choice')) return;
 
-      const nav = document.createElement('nav');
-      nav.className = 'intro-section-choice';
-      nav.setAttribute('aria-label', '섹션 선택');
-      nav.innerHTML = `
-        <img class="intro-menu-clover" src="assets/lucky-four-clover.png" alt="">
-        <a class="leaf-choice leaf-choice-hope" href="#leaf1" data-target="leaf1"><span>HOPE</span><b>Introduce</b></a>
-        <a class="leaf-choice leaf-choice-faith" href="#leaf2" data-target="leaf2"><span>FAITH</span><b>Projects</b></a>
-        <a class="leaf-choice leaf-choice-happiness" href="#leaf3" data-target="leaf3"><span>HAPPINESS</span><b>Lifestyle</b></a>
-        <a class="leaf-choice leaf-choice-luck" href="#leaf4" data-target="leaf4"><span>LUCK</span><b>Contact</b></a>`;
-      nav.querySelectorAll('a').forEach(link => {
-        link.addEventListener('click', event => {
-          event.preventDefault();
-          enterSection(link.dataset.target);
-        });
-      });
-      intro.appendChild(nav);
+      appendIntroSectionChoice(intro, enterSectionFromIntro);
       luckyTarget.style.display = 'none';
     }, 760);
   }
 
   function onMouseMove(e) { update(e.clientX, e.clientY); }
+  function onPointerMove(e) { update(e.clientX, e.clientY); }
   function onIntroClick() {
     if (found) return;
     const { x: fx, y: fy } = getFl4Pos();
@@ -378,10 +427,12 @@ function initIntro() {
   }
 
   window.addEventListener('mousemove', onMouseMove);
+  intro.addEventListener('pointermove', onPointerMove);
   intro.addEventListener('click', onIntroClick);
 
   _introCleanup = () => {
     window.removeEventListener('mousemove', onMouseMove);
+    intro.removeEventListener('pointermove', onPointerMove);
     intro.removeEventListener('click', onIntroClick);
   };
 }
@@ -395,9 +446,40 @@ function initProjectScroller() {
 
   const slides = Array.from(track.querySelectorAll('.project-slide'));
   const timelineItems = Array.from(section.querySelectorAll('.project-timeline-item'));
+  const wheelTarget = section.querySelector('.project-cover-content') || section;
   const maxIndex = Math.max(slides.length - 1, 0);
   let activeIndex = 0;
   let wheelLocked = false;
+  let wheelDeltaSum = 0;
+  let wheelDirection = 0;
+  const projectWheelThreshold = 120;
+  let isSnappingToCenter = false;
+
+  function getCenterLockState(target) {
+    const rect = target.getBoundingClientRect();
+    const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+    const viewportCenter = viewportHeight / 2;
+    const centerDelta = rect.top + rect.height / 2 - viewportCenter;
+    const tolerance = Math.max(18, Math.min(34, viewportHeight * 0.035));
+
+    return {
+      rect,
+      isLocked: Math.abs(centerDelta) <= tolerance,
+      isNear: rect.top < viewportHeight * 0.42 && rect.bottom > viewportHeight * 0.58,
+    };
+  }
+
+  function snapTargetToCenter(target) {
+    const { rect } = getCenterLockState(target);
+    const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+    const top = window.scrollY + rect.top + rect.height / 2 - viewportHeight / 2;
+
+    isSnappingToCenter = true;
+    window.scrollTo({ top, left: 0, behavior: getScrollBehavior('smooth') });
+    window.setTimeout(() => {
+      isSnappingToCenter = false;
+    }, 420);
+  }
 
   function render() {
     slides.forEach((slide, index) => {
@@ -406,6 +488,12 @@ function initProjectScroller() {
       slide.setAttribute('aria-hidden', String(!isActive));
       slide.style.transform = `translate3d(${(index - activeIndex) * 100}%, 0, 0)`;
     });
+    if (wheelTarget.classList.contains('is-reveal-active')) {
+      const activeSlide = slides[activeIndex];
+      const slideRevealItems = activeSlide ? Array.from(activeSlide.querySelectorAll(REVEAL_SELECTOR)) : [];
+      resetRevealItems(slides.flatMap(slide => Array.from(slide.querySelectorAll(REVEAL_SELECTOR))));
+      requestAnimationFrame(() => revealItems(slideRevealItems, { stepDelay: 90 }));
+    }
     updateProjectState(activeIndex);
   }
 
@@ -421,35 +509,56 @@ function initProjectScroller() {
     render();
   }
 
-  function canStepProject(direction) {
-    return direction > 0 ? activeIndex < maxIndex : activeIndex > 0;
-  }
-
-  function onProjectWheel(event) {
-    if (Math.abs(event.deltaY) < 8) return;
-
-    const direction = event.deltaY > 0 ? 1 : -1;
-    if (!canStepProject(direction)) return;
-
-    event.preventDefault();
-    if (wheelLocked) return;
-
-    wheelLocked = true;
-    showProject(activeIndex + direction);
-    window.setTimeout(() => {
-      wheelLocked = false;
-    }, 520);
-  }
-
   timelineItems.forEach(button => {
     button.addEventListener('click', () => {
       showProject(Number(button.dataset.projectIndex || 0));
     });
   });
 
-  section.addEventListener('wheel', onProjectWheel, { passive: false });
+  function onProjectWheel(event) {
+    const centerState = getCenterLockState(wheelTarget);
+    if (!centerState.isNear) {
+      wheelDeltaSum = 0;
+      wheelDirection = 0;
+      return;
+    }
+
+    const direction = Math.sign(event.deltaY);
+    if (!direction) return;
+
+    const nextIndex = activeIndex + direction;
+    const canMoveProject = nextIndex >= 0 && nextIndex <= maxIndex;
+    if (!canMoveProject) return;
+
+    event.preventDefault();
+    if (!centerState.isLocked || isSnappingToCenter) {
+      wheelDeltaSum = 0;
+      wheelDirection = 0;
+      if (!isSnappingToCenter) snapTargetToCenter(wheelTarget);
+      return;
+    }
+    if (wheelLocked) return;
+
+    if (direction !== wheelDirection) {
+      wheelDirection = direction;
+      wheelDeltaSum = 0;
+    }
+
+    wheelDeltaSum += Math.abs(event.deltaY);
+    if (wheelDeltaSum < projectWheelThreshold) return;
+
+    wheelDeltaSum = 0;
+    wheelLocked = true;
+    showProject(nextIndex);
+
+    window.setTimeout(() => {
+      wheelLocked = false;
+    }, 680);
+  }
+
   render();
-  window.addEventListener('resize', render);
+  window.addEventListener('resize', createRafRunner(render));
+  window.addEventListener('wheel', onProjectWheel, { passive: false });
 }
 
 // ─── POLAROID CAROUSEL ───────────────────────────────────────────────────────
@@ -458,12 +567,43 @@ function initPolaroid() {
   const track = document.getElementById('polaroid-track');
   if (!track) return;
   const section = track.closest('.leaf');
+  const wheelTarget = section?.querySelector('.happiness-cover-content') || section;
   const cards   = Array.from(track.querySelectorAll('.polaroid'));
   const dots    = Array.from(document.querySelectorAll('.pd-dot'));
   const counter = document.querySelector('.pd-count .serif');
+  const leftArrow = document.querySelector('.polaroid-arrow.left');
+  const rightArrow = document.querySelector('.polaroid-arrow.right');
   const total   = cards.length;
+  if (!total || !leftArrow || !rightArrow) return;
   const TILTS   = cards.map((_, i) => i * 37 % 11 - 5);
   let wheelLocked = false;
+  let isSnappingToCenter = false;
+
+  function getCenterLockState(target) {
+    const rect = target.getBoundingClientRect();
+    const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+    const viewportCenter = viewportHeight / 2;
+    const centerDelta = rect.top + rect.height / 2 - viewportCenter;
+    const tolerance = Math.max(18, Math.min(34, viewportHeight * 0.035));
+
+    return {
+      rect,
+      isLocked: Math.abs(centerDelta) <= tolerance,
+      isNear: rect.top < viewportHeight * 0.42 && rect.bottom > viewportHeight * 0.58,
+    };
+  }
+
+  function snapTargetToCenter(target) {
+    const { rect } = getCenterLockState(target);
+    const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+    const top = window.scrollY + rect.top + rect.height / 2 - viewportHeight / 2;
+
+    isSnappingToCenter = true;
+    window.scrollTo({ top, left: 0, behavior: getScrollBehavior('smooth') });
+    window.setTimeout(() => {
+      isSnappingToCenter = false;
+    }, 420);
+  }
 
   function goTo(index) {
     const nextIndex = Math.max(0, Math.min(total - 1, index));
@@ -484,7 +624,14 @@ function initPolaroid() {
     const direction = event.deltaY > 0 ? 1 : -1;
     if (!canStep(direction)) return;
 
+    const centerState = getCenterLockState(wheelTarget);
+    if (!centerState.isNear) return;
+
     event.preventDefault();
+    if (!centerState.isLocked || isSnappingToCenter) {
+      if (!isSnappingToCenter) snapTargetToCenter(wheelTarget);
+      return;
+    }
     if (wheelLocked) return;
 
     wheelLocked = true;
@@ -503,28 +650,24 @@ function initPolaroid() {
       const x   = offset * sideGap;
       const rot = TILTS[i] + (isCenter ? 0 : offset < 0 ? -6 : 6);
       card.style.transform  = `translate(-50%, -50%) translateX(${x}px) rotate(${rot}deg) scale(${isCenter ? centerScale : 0.78})`;
-      card.style.zIndex     = String(isCenter ? 5 : Math.abs(offset) === 1 ? 3 : 1);
+      card.style.zIndex     = String(isCenter ? 30 : Math.abs(offset) === 1 ? 3 : 1);
       card.style.opacity    = String(Math.abs(offset) > 2 ? 0 : isCenter ? 1 : 0.55);
       card.style.transition = 'transform .55s cubic-bezier(.2,.9,.3,1.05), opacity .35s ease';
       card.classList.toggle('active', isCenter);
     });
     dots.forEach((dot, i) => dot.classList.toggle('active', i === st.carouselIdx));
     if (counter) counter.textContent = String(st.carouselIdx + 1).padStart(2, '0');
-    document.querySelector('.polaroid-arrow.left').disabled  = st.carouselIdx === 0;
-    document.querySelector('.polaroid-arrow.right').disabled = st.carouselIdx === total - 1;
+    leftArrow.disabled  = st.carouselIdx === 0;
+    rightArrow.disabled = st.carouselIdx === total - 1;
   }
 
-  document.querySelector('.polaroid-arrow.left')
-    ?.addEventListener('click', () => { if (canStep(-1)) goTo(st.carouselIdx - 1); });
-  document.querySelector('.polaroid-arrow.right')
-    ?.addEventListener('click', () => { if (canStep(1)) goTo(st.carouselIdx + 1); });
+  leftArrow.addEventListener('click', () => { if (canStep(-1)) goTo(st.carouselIdx - 1); });
+  rightArrow.addEventListener('click', () => { if (canStep(1)) goTo(st.carouselIdx + 1); });
   dots.forEach((dot, i) => dot.addEventListener('click', () => { goTo(i); }));
 
-  section?.addEventListener('wheel', onPolaroidWheel, { passive: false });
+  wheelTarget?.addEventListener('wheel', onPolaroidWheel, { passive: false });
   render();
-  window.addEventListener('resize', () => {
-    render();
-  });
+  window.addEventListener('resize', createRafRunner(render));
 }
 
 function initProjectLinks() {
@@ -590,10 +733,171 @@ function initPhotoScatterModal() {
   });
 }
 
+function initSequentialReveal() {
+  const covers = Array.from(document.querySelectorAll('.leaf-cover-content'));
+  if (!covers.length) return;
+
+  covers.forEach(cover => {
+    const items = Array.from(cover.querySelectorAll(REVEAL_SELECTOR));
+    items.forEach(item => item.classList.add('reveal-item'));
+  });
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+
+      entry.target.classList.add('is-reveal-active');
+      const activeProjectSlide = entry.target.querySelector('.project-slide.is-active');
+      const projectTimelineItems = Array.from(entry.target.querySelectorAll('.project-timeline-item'));
+      const items = activeProjectSlide
+        ? [...Array.from(activeProjectSlide.querySelectorAll(REVEAL_SELECTOR)), ...projectTimelineItems]
+        : Array.from(entry.target.querySelectorAll(REVEAL_SELECTOR));
+      revealItems(items);
+      observer.unobserve(entry.target);
+    });
+  }, {
+    threshold: 0.04,
+    rootMargin: '0px 0px -4% 0px',
+  });
+
+  covers.forEach(cover => observer.observe(cover));
+}
+
+function initTitleFadeOnCover() {
+  const pairs = Array.from(document.querySelectorAll('.leaf-cover-content'))
+    .map(cover => {
+      const section = cover.closest('.leaf');
+      const title = section?.querySelector('.leaf-header');
+      return title ? { cover, title } : null;
+    })
+    .filter(Boolean);
+
+  if (!pairs.length) return;
+
+  let ticking = false;
+
+  function update() {
+    const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+    const fadeStart = viewportHeight * 0.92;
+    const fadeEnd = viewportHeight * 0.56;
+
+    pairs.forEach(({ cover, title }) => {
+      const top = cover.getBoundingClientRect().top;
+      const fadeRange = Math.max(1, fadeStart - fadeEnd);
+      const progress = Math.min(1, Math.max(0, (fadeStart - top) / fadeRange));
+      const easedProgress = progress * progress * (3 - 2 * progress);
+      const opacity = 1 - easedProgress;
+      title.style.opacity = opacity.toFixed(3);
+      title.style.visibility = opacity < 0.04 ? 'hidden' : '';
+      title.style.pointerEvents = opacity < 0.08 ? 'none' : '';
+    });
+
+    ticking = false;
+  }
+
+  function requestUpdate() {
+    if (ticking) return;
+    ticking = true;
+    window.requestAnimationFrame(update);
+  }
+
+  update();
+  window.addEventListener('scroll', requestUpdate, { passive: true });
+  window.addEventListener('resize', requestUpdate);
+}
+
+function initLandingLeafMotion() {
+  const movingLeaf = document.querySelector('.hope-scroll-leaf');
+  const heroTitleBox = document.querySelector('#leaf1 .leaf-header > div:first-child');
+  const aboutLede = document.querySelector('#leaf1 .about-lede');
+  if (!movingLeaf) return;
+  let start = { x: 0, y: 0, width: 1 };
+  let ledeTarget = { x: 0, y: 0, scale: 1 };
+
+  function interpolate(from, to, progress) {
+    return from + (to - from) * progress;
+  }
+
+  function setMovingLeaf(progress) {
+    const easedProgress = progress * progress * (3 - 2 * progress);
+    const current = {
+      x: interpolate(start.x, ledeTarget.x, easedProgress),
+      y: interpolate(start.y, ledeTarget.y, easedProgress),
+      scale: interpolate(1, ledeTarget.scale, easedProgress),
+      rotate: interpolate(8, 4, easedProgress),
+    };
+
+    const opacityIn = Math.min(1, progress / .08);
+    const opacityOut = progress > .82 ? Math.max(0, 1 - (progress - .82) / .18) : 1;
+    const opacity = progress <= 0.01 ? 0 : opacityIn * opacityOut;
+
+    movingLeaf.style.setProperty('--hope-leaf-x', `${current.x}px`);
+    movingLeaf.style.setProperty('--hope-leaf-y', `${current.y}px`);
+    movingLeaf.style.setProperty('--hope-leaf-scale', current.scale.toFixed(4));
+    movingLeaf.style.setProperty('--hope-leaf-rotate', `${current.rotate.toFixed(2)}deg`);
+    movingLeaf.style.setProperty('--hope-leaf-opacity', opacity.toFixed(3));
+
+  }
+
+  function measureMorph() {
+    if (!movingLeaf) return;
+
+    const previousOpacity = movingLeaf.style.getPropertyValue('--hope-leaf-opacity');
+
+    const titleRect = heroTitleBox?.getBoundingClientRect();
+    const leafRect = movingLeaf.getBoundingClientRect();
+    const leafWidth = leafRect.width || 1;
+    const leafHeight = leafRect.height || 1;
+    const ledeRect = aboutLede?.getBoundingClientRect();
+    const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
+    const titleRight = titleRect ? titleRect.right : viewportWidth * .72;
+    const titleTop = titleRect ? titleRect.top : window.innerHeight * .45;
+    const titleHeight = titleRect ? titleRect.height : 120;
+
+    start = {
+      x: titleRight - leafWidth * .34,
+      y: titleTop + titleHeight * .45 - leafHeight * .52,
+      width: leafWidth,
+    };
+
+    const ledeCenterX = ledeRect
+      ? Math.min(viewportWidth - leafWidth * .72, ledeRect.right + leafWidth * .12)
+      : start.x;
+    const ledeCenterY = ledeRect
+      ? ledeRect.top + ledeRect.height * .35
+      : start.y;
+
+    ledeTarget = {
+      x: ledeCenterX - leafWidth / 2,
+      y: ledeCenterY - leafHeight / 2,
+      scale: window.innerWidth <= 900 ? .46 : .62,
+    };
+
+    movingLeaf.style.setProperty('--hope-leaf-opacity', previousOpacity || '1');
+  }
+
+  function update() {
+    const morphDistance = window.innerHeight * 1.42;
+    const progress = Math.min(1, Math.max(0, window.scrollY / morphDistance));
+
+    setMovingLeaf(progress);
+  }
+
+  measureMorph();
+  update();
+  window.addEventListener('scroll', createRafRunner(update), { passive: true });
+  window.addEventListener('resize', createRafRunner(() => {
+    measureMorph();
+    update();
+  }));
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   applyPaletteVars(st.paletteKey);
-  initCornerClovers();
   initIntro();
+  initLandingLeafMotion();
+  initSequentialReveal();
+  initTitleFadeOnCover();
   initProjectScroller();
   initProjectLinks();
   initPhotoScatterModal();
