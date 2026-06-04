@@ -26,6 +26,8 @@
 em { font-style: normal; }
 
 html {
+  width: 100%;
+  min-width: 100%;
   margin: 0;
   padding: 0;
   background: var(--bg);
@@ -35,6 +37,7 @@ html {
 
 body {
   width: 100%;
+  min-width: 100%;
   max-width: none;
   margin: 0;
   padding: 0;
@@ -84,9 +87,10 @@ svg {
   position: fixed;
   top: 0;
   bottom: 0;
-  left: 50%;
-  width: min(100vw, var(--page-max));
-  transform: translateX(-50%);
+  left: 0;
+  right: 0;
+  width: 100%;
+  transform: none;
   background: #355f18;
   z-index: 50;
   overflow: hidden;
@@ -440,8 +444,9 @@ svg {
 .app {
   position: relative;
   width: 100%;
-  max-width: var(--page-max);
-  margin: 0 auto;
+  max-width: none;
+  margin: 0;
+  background: var(--bg);
 }
 
 section.leaf {
