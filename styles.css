@@ -485,9 +485,8 @@ section.leaf + section.leaf { border-top: 1px solid var(--rule); }
 .leaf-header > div:first-child {
   position: relative;
   z-index: 2;
-  width: min(1280px, calc(100vw - (var(--page-pad) * 2)));
-  padding-right: clamp(280px, 21vw, 400px);
-  text-align: right;
+  width: min(1600px, calc(100vw - (var(--page-pad) * 2)));
+  text-align: left;
 }
 .leaf-meta {
   font-size: 11px;
@@ -502,23 +501,36 @@ section.leaf + section.leaf { border-top: 1px solid var(--rule); }
   text-align: left;
 }
 .leaf-meta .num { color: var(--ink-mute); margin-right: 12px; }
+
+.leaf-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: clamp(18px, 2.2vw, 42px);
+  margin-top: 12px;
+}
+
 .leaf-title {
   font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Noto Sans KR', system-ui, sans-serif;
   width: max-content;
-  max-width: calc(100vw - (var(--page-pad) * 2));
+  max-width: 100%;
   white-space: nowrap;
   font-size: clamp(40px, 6.4vw, 82px);
   font-weight: 400;
   line-height: 1.2;
   letter-spacing: -.02em;
-  margin: 12px 0 0 auto;
+  margin: 0;
+}
+
+.leaf-title-row .leaf-title {
+  margin: 0;
 }
 
 .leaf-title em { color: var(--green-dark); }
 .leaf-kw {
   position: static;
   display: inline-block;
-  text-align: right;
+  text-align: left;
   color: var(--ink-soft);
   font-size: 1em;
   max-width: none;
@@ -527,32 +539,34 @@ section.leaf + section.leaf { border-top: 1px solid var(--rule); }
 }
 
 .section-title-clover {
-  position: absolute;
-  right: clamp(52px, 9vw, 180px);
-  top: 50%;
+  position: static;
   z-index: 1;
-  width: clamp(190px, 18vw, 340px);
+  width: clamp(120px, 10vw, 190px);
   height: auto;
+  flex: 0 0 auto;
   pointer-events: none;
   filter: drop-shadow(0 26px 38px rgba(35, 70, 28, .14));
-  transform: translateY(-50%) rotate(8deg);
+  transform: rotate(8deg);
   transform-origin: center;
 }
 
 .section-title-clover-hope {
-  width: clamp(170px, 15vw, 280px);
+  width: clamp(108px, 8.6vw, 160px);
 }
 
 .section-title-clover-faith {
-  width: clamp(210px, 20vw, 380px);
-  right: clamp(42px, 7vw, 150px);
-  transform: translateY(-50%) rotate(-4deg);
+  width: clamp(140px, 12vw, 220px);
+  transform: rotate(-4deg);
 }
 
 .section-title-clover-happiness {
-  width: clamp(210px, 19vw, 360px);
-  right: clamp(42px, 7vw, 150px);
-  transform: translateY(-50%) rotate(5deg);
+  width: clamp(140px, 11vw, 210px);
+  transform: rotate(5deg);
+}
+
+.section-title-clover-luck {
+  width: clamp(150px, 12vw, 230px);
+  transform: rotate(3deg);
 }
 .leaf-kw .kw-zh {
   display: block;
@@ -2063,7 +2077,8 @@ section.leaf + section.leaf { border-top: 1px solid var(--rule); }
 
 /* ── Contact (Leaf 4) ── */
 #leaf4 {
-  min-height: auto;
+  min-height: 200vh;
+  min-height: 200dvh;
 }
 
 #leaf4 .contact-cover-content,
@@ -2087,14 +2102,6 @@ section.leaf + section.leaf { border-top: 1px solid var(--rule); }
   align-items: center;
   flex: 0 0 auto;
   min-height: auto;
-}
-
-.contact-luck-clover {
-  right: clamp(10px, 2vw, 30px);
-  top: clamp(-34px, -3vw, -16px);
-  width: clamp(110px, 10vw, 170px);
-  opacity: .92;
-  transform: rotate(8deg);
 }
 
 .contact-intro {
@@ -2541,25 +2548,22 @@ section.leaf + section.leaf { border-top: 1px solid var(--rule); }
     font-size: clamp(26px, 7vw, 44px);
   }
   .leaf-header > div:first-child {
-    padding-right: clamp(94px, 22vw, 170px);
+    padding-right: 0;
+  }
+  .leaf-title-row {
+    gap: clamp(10px, 3vw, 18px);
   }
   .section-title-clover {
-    right: clamp(18px, 5vw, 42px);
-    width: clamp(96px, 22vw, 170px);
+    width: clamp(62px, 15vw, 108px);
   }
   .section-title-clover-faith,
-  .section-title-clover-happiness {
-    right: clamp(12px, 4vw, 36px);
-    width: clamp(120px, 27vw, 190px);
-  }
-  .contact-luck-clover {
-    top: -28px;
-    right: 4px;
-    width: clamp(82px, 18vw, 120px);
+  .section-title-clover-happiness,
+  .section-title-clover-luck {
+    width: clamp(78px, 18vw, 126px);
   }
   .leaf-header { gap: 12px; }
   .leaf-kw {
-    text-align: right;
+    text-align: left;
     max-width: none;
   }
   .happiness-sticky {
