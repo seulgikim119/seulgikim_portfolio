@@ -806,96 +806,9 @@ function initTitleFadeOnCover() {
   window.addEventListener('resize', requestUpdate);
 }
 
-function initLandingLeafMotion() {
-  const movingLeaf = document.querySelector('.hope-scroll-leaf');
-  const heroTitleBox = document.querySelector('#leaf1 .leaf-header > div:first-child');
-  const aboutLede = document.querySelector('#leaf1 .about-lede');
-  if (!movingLeaf) return;
-  let start = { x: 0, y: 0, width: 1 };
-  let ledeTarget = { x: 0, y: 0, scale: 1 };
-
-  function interpolate(from, to, progress) {
-    return from + (to - from) * progress;
-  }
-
-  function setMovingLeaf(progress) {
-    const easedProgress = progress * progress * (3 - 2 * progress);
-    const current = {
-      x: interpolate(start.x, ledeTarget.x, easedProgress),
-      y: interpolate(start.y, ledeTarget.y, easedProgress),
-      scale: interpolate(1, ledeTarget.scale, easedProgress),
-      rotate: interpolate(8, 4, easedProgress),
-    };
-
-    const opacityIn = Math.min(1, progress / .08);
-    const opacityOut = progress > .82 ? Math.max(0, 1 - (progress - .82) / .18) : 1;
-    const opacity = progress <= 0.01 ? 0 : opacityIn * opacityOut;
-
-    movingLeaf.style.setProperty('--hope-leaf-x', `${current.x}px`);
-    movingLeaf.style.setProperty('--hope-leaf-y', `${current.y}px`);
-    movingLeaf.style.setProperty('--hope-leaf-scale', current.scale.toFixed(4));
-    movingLeaf.style.setProperty('--hope-leaf-rotate', `${current.rotate.toFixed(2)}deg`);
-    movingLeaf.style.setProperty('--hope-leaf-opacity', opacity.toFixed(3));
-
-  }
-
-  function measureMorph() {
-    if (!movingLeaf) return;
-
-    const previousOpacity = movingLeaf.style.getPropertyValue('--hope-leaf-opacity');
-
-    const titleRect = heroTitleBox?.getBoundingClientRect();
-    const leafRect = movingLeaf.getBoundingClientRect();
-    const leafWidth = leafRect.width || 1;
-    const leafHeight = leafRect.height || 1;
-    const ledeRect = aboutLede?.getBoundingClientRect();
-    const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
-    const titleRight = titleRect ? titleRect.right : viewportWidth * .72;
-    const titleTop = titleRect ? titleRect.top : window.innerHeight * .45;
-    const titleHeight = titleRect ? titleRect.height : 120;
-
-    start = {
-      x: titleRight - leafWidth * .34,
-      y: titleTop + titleHeight * .45 - leafHeight * .52,
-      width: leafWidth,
-    };
-
-    const ledeCenterX = ledeRect
-      ? Math.min(viewportWidth - leafWidth * .72, ledeRect.right + leafWidth * .12)
-      : start.x;
-    const ledeCenterY = ledeRect
-      ? ledeRect.top + ledeRect.height * .35
-      : start.y;
-
-    ledeTarget = {
-      x: ledeCenterX - leafWidth / 2,
-      y: ledeCenterY - leafHeight / 2,
-      scale: window.innerWidth <= 900 ? .46 : .62,
-    };
-
-    movingLeaf.style.setProperty('--hope-leaf-opacity', previousOpacity || '1');
-  }
-
-  function update() {
-    const morphDistance = window.innerHeight * 1.42;
-    const progress = Math.min(1, Math.max(0, window.scrollY / morphDistance));
-
-    setMovingLeaf(progress);
-  }
-
-  measureMorph();
-  update();
-  window.addEventListener('scroll', createRafRunner(update), { passive: true });
-  window.addEventListener('resize', createRafRunner(() => {
-    measureMorph();
-    update();
-  }));
-}
-
 document.addEventListener('DOMContentLoaded', () => {
   applyPaletteVars(st.paletteKey);
   initIntro();
-  initLandingLeafMotion();
   initSequentialReveal();
   initTitleFadeOnCover();
   initProjectScroller();
