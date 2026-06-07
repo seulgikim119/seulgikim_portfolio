@@ -142,10 +142,119 @@ index.html
 
 ---
 
+## 작업 6 — 우측 클로버 네비게이션 추가
+
+- **언제**: 2026-06-07
+- **누가**: Claude (요청자: 김슬기)
+- **무엇을**: 각 섹션 타이틀의 클로버 이미지를 우측 고정 네비게이션 아이콘으로 재사용
+- **어디서**: `index.html` (nav 마크업), `styles.css` (leaf-nav 블록), `app.js` (initLeafNav 함수)
+- **어떻게**:
+  - `#leaf-nav` 고정 우측 네비 추가 — hope/faith/happiness/luck 클로버 이미지 4개
+  - CSS: `position: fixed; right; top: 50%` 수직 중앙 배치, 기본 흑백 → 활성 풀컬러 전환
+  - JS: `IntersectionObserver` 대신 스크롤 기반 `requestAnimationFrame` 으로 가장 가까운 섹션 감지
+  - 클릭 시 `scrollIntoView({ behavior: 'smooth' })` 적용
+  - 인트로 `passed-through` 클래스 감지(`MutationObserver`) → 네비 등장
+- **왜**: 현재 섹션을 한눈에 파악하고 빠르게 이동할 수 있는 내비게이션 UX 필요
+
+---
+
+## 작업 7 — 전체 인터랙션 스무스 개선 + 반응형 정비
+
+- **언제**: 2026-06-07
+- **누가**: Claude (요청자: 김슬기)
+- **무엇을**: 모든 인터랙션의 전환 품질 향상 및 화면 크기별 자연스러운 반응형 처리
+- **어디서**: `styles.css` (전역 및 leaf-nav 블록), `app.js` (initLeafNav 함수)
+- **어떻게**:
+  1. **leaf-nav CSS 재작성**
+     - `opacity` 토글 → `visibility` 로 변경 (합성 레이어 충돌 방지)
+     - `@keyframes leaf-nav-item-in` 추가 — 4개 항목 `68ms` 간격 stagger 등장
+     - `will-change: transform, filter` 적용으로 GPU 합성 유도
+     - 레이블 슬라이드: `order: -1` + `translateX(6px → 0)` 로 이미지 왼쪽에서 등장
+     - 반응형 4단계: >1280px(40px) / 900-1280px(34px) / 600-900px(28px, 레이블 숨김) / <600px(하단 pill 수평 네비)
+     - 600px 이하: `backdrop-filter: blur(14px)` pill 형태로 하단 고정, `border-radius: 100px`
+  2. **initLeafNav JS 재작성**
+     - `IntersectionObserver(threshold:0.3)` → 스크롤 RAF 쓰로틀 + 뷰포트 중앙 거리 계산으로 교체 (깜박임 제거)
+     - `window.scrollTo({ top: offsetTop })` → `scrollIntoView({ behavior: 'smooth' })` 로 교체
+     - `--nav-i` CSS 변수로 각 항목 stagger delay 제어
+     - `shown` 플래그로 입장 애니메이션 최초 1회만 재생 보장
+  3. **전역 CSS 스무스 추가**
+     - `.photo-modal-close`: `transform scale(1.1) rotate(8deg)` 호버 트랜지션 추가
+     - `.foot`: 540px 이하에서 `flex-direction: column; text-align: center` 자연스럽게 줄바꿈
+- **왜**: 화면 크기에 따라 네비가 흔들리거나 잘리지 않고 자연스럽게 크기가 변해야 하며, 활성 섹션 감지 깜박임을 제거해야 했음
+
+---
+
+## 작업 8 — 여행 폴라로이드 hover 이미지 배치 재정렬 (왼쪽 3 / 오른쪽 4)
+
+- **언제**: 2026-06-07
+- **누가**: Claude (요청자: 김슬기)
+- **무엇을**: 여행 폴라로이드 카드 hover 시 나타나는 7장 미니 사진의 위치를 왼쪽 3장·오른쪽 4장으로 균등 배치
+- **어디서**: `styles.css` — `.travel-hover-1` ~ `.travel-hover-7` 개별 선택자
+- **어떻게**:
+  - **왼쪽 3장** (travel-hover-1·3·5): 상단(top:11%) → 중단(top:42%) → 하단(bottom:11%) 수직 균등 분배
+    - 각 `--x` 값 `-84% ~ -88%` 로 카드 좌측 충분한 여백 확보
+    - `--y` 값: 상단 -22% / 중단 0% / 하단 +20% 으로 기울기 반영
+  - **오른쪽 4장** (travel-hover-6·2·4·7): 최상단(top:5%) → 상(top:30%) → 하(top:56%) → 최하단(bottom:5%) 4분할
+    - 각 `--x` 값 `+78% ~ +84%` 우측 배치
+    - `--y` 값: -36% / -10% / +10% / +34% 로 단계적 하강
+  - 회전각(--rot)·float delay(--delay)는 자연스러운 느낌 유지
+  - 모바일(max-width:720px) travel-hover-7 오버라이드도 동일 방향 정합성으로 조정
+- **왜**: 기존에는 hover-5·6이 `top:4%, --y:-30%`로 화면 상단에 과도하게 밀집해 시각적으로 산만했음. 좌우 컬럼 수직 간격을 균등하게 배분하여 깔끔한 부채꼴 레이아웃으로 개선
+
+---
+
+## 작업 9 — 푸터 배경색 섹션과 통일
+
+- **언제**: 2026-06-07
+- **누가**: Claude (요청자: 김슬기)
+- **무엇을**: 푸터 배경색이 나머지 섹션과 달라 보이던 문제 수정
+- **어디서**: `styles.css` — `.foot { background }` 한 줄
+- **어떻게**: `background: var(--bg)` → `background: var(--section-bg)` 로 변경
+- **왜**: JS `applyPaletteVars()`가 DOMContentLoaded 시 `--bg`를 forest 팔레트 값(`#f6f1e4`)으로 덮어쓰지만 `--section-bg`는 업데이트하지 않아 두 값이 달라짐. 섹션들은 `--section-bg`를 사용하므로 푸터도 동일 변수를 참조하도록 통일
+
+---
+
+## 작업 10 — 사진촬영 폴라로이드 hover 이미지 배치 재정렬 (왼쪽 2 / 오른쪽 3)
+
+- **언제**: 2026-06-07
+- **누가**: Claude (요청자: 김슬기)
+- **무엇을**: 사진촬영 폴라로이드 카드 hover 시 나타나는 5장 미니 사진 위치 정리
+- **어디서**: `styles.css` — `.photo-hover-1` ~ `.photo-hover-5`
+- **어떻게**:
+  - **왼쪽 2장** (photo-hover-1·3): 상단(top:16%) · 하단(bottom:12%) 2분할
+    - `--x: -76 ~ -78%`, `--y: -22% / +22%` 로 위아래 대칭 배분
+  - **오른쪽 3장** (photo-hover-2·4·5): 상단(top:8%) · 중단(top:44%) · 하단(bottom:8%) 3분할
+    - `--x: +76 ~ +80%`, `--y: -28% / +2% / +26%` 단계적 배분
+  - photo-hover-5의 기존 `right: -7%` (클라우드 밖으로 삐져나옴) → `right: 6%` 로 교정
+  - 모바일(max-width:720px) photo-hover-5 오버라이드도 정합성 맞게 조정
+- **왜**: 기존에 photo-hover-4·5가 모두 bottom에 겹쳐 있고, photo-hover-3이 left:-1%로 클라우드 밖에 걸쳐 있어 시각적으로 산만했음
+
+---
+
+## 작업 11 — About 섹션 모바일 반응형 수정
+
+- **언제**: 2026-06-07
+- **누가**: Claude (요청자: 김슬기)
+- **무엇을**: 좁은 모바일 뷰포트(390px 등)에서 scatter 포토 3장이 상단에 겹쳐 보이는 문제 수정
+- **어디서**: `styles.css` — `@media (max-width: 900px)` 블록 및 `@media (max-width: 540px)` 블록
+- **어떻게**:
+  - **원인**: `aspect-ratio: 16/8` (2:1 가로비)로 인해 폭이 좁아질수록 portrait 높이가 급격히 감소 → 390px에서 약 184px만 확보돼 사진 3장이 30~40px 구간에 몰림
+  - **900px 블록**: 그대로 유지 (`aspect-ratio: 16/8; min-height: 220px`) — 500–900px 범위에서는 충분한 높이 확보됨
+  - **540px 블록(신규 추가)**:
+    - `.about-portrait`: `aspect-ratio: auto; height: clamp(310px, 86vw, 420px); min-height: 310px` — 폭 비례 대신 명시적 높이 부여
+    - `.photo-scatter-board`: `min-height: 288px`
+    - scatter-photo-1: `left: 4%; top: 5%` (좌상단 여백 확보)
+    - scatter-photo-2: `right: 4%; bottom: 20%; width: clamp(100px, 32vw, 132px)`
+    - scatter-photo-3: `left: 26%; bottom: 3%; width: clamp(94px, 30vw, 124px)`
+    - scatter-photo-main: `width: clamp(118px, 38vw, 155px)` (중앙 크기 조정)
+  - 결과: 390px 뷰포트에서 사진 3장이 15–287px 구간으로 분산 배치
+- **왜**: 400px 미만 모바일에서 aspect-ratio 계산값이 min-height 기준보다 작아 레이아웃이 무너짐
+
+---
+
 ## 다음 작업
 
 - 실제 사진 및 프로젝트 이미지 삽입 (about-portrait 플레이스홀더 교체)
 - 프로젝트 상세 페이지 또는 모달 연결
 - localStorage로 마지막 팔레트 설정 유지
 - 인트로 스킵 옵션 (재방문 시 바로 메인으로)
-- 반응형 모바일 점검 및 개선

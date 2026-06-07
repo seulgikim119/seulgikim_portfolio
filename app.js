@@ -686,6 +686,79 @@ function initProjectLinks() {
   }, true);
 }
 
+// ─── LEAF SIDE NAV ───────────────────────────────────────────────────────────
+
+function initLeafNav() {
+  const nav = document.getElementById('leaf-nav');
+  if (!nav) return;
+
+  const items = Array.from(nav.querySelectorAll('.leaf-nav-item'));
+  const intro = document.getElementById('intro');
+  const leaves = ['leaf1', 'leaf2', 'leaf3', 'leaf4']
+    .map(id => document.getElementById(id))
+    .filter(Boolean);
+
+  // CSS stagger index
+  items.forEach((item, i) => item.style.setProperty('--nav-i', String(i)));
+
+  // Click → smooth scroll to section
+  items.forEach(item => {
+    item.addEventListener('click', event => {
+      event.preventDefault();
+      const target = document.getElementById(item.dataset.leaf);
+      if (!target) return;
+      target.scrollIntoView({ behavior: getScrollBehavior('smooth') });
+    });
+  });
+
+  // Active section: scroll-based, find leaf whose center is closest to viewport center
+  let activeTick = false;
+  function updateActive() {
+    if (activeTick) return;
+    activeTick = true;
+    requestAnimationFrame(() => {
+      activeTick = false;
+      const mid = window.innerHeight / 2;
+      let nearest = null;
+      let minDist = Infinity;
+      leaves.forEach(leaf => {
+        const rect = leaf.getBoundingClientRect();
+        const dist = Math.abs(rect.top + rect.height / 2 - mid);
+        if (dist < minDist) { minDist = dist; nearest = leaf; }
+      });
+      if (nearest) {
+        items.forEach(item => {
+          item.classList.toggle('is-active', item.dataset.leaf === nearest.id);
+        });
+      }
+    });
+  }
+
+  window.addEventListener('scroll', updateActive, { passive: true });
+  updateActive();
+
+  // Show nav after intro is passed — stagger animation plays once
+  let shown = false;
+  function showNav() {
+    if (shown) return;
+    shown = true;
+    requestAnimationFrame(() => {
+      nav.classList.add('is-visible');
+      updateActive();
+    });
+  }
+
+  function checkVisibility() {
+    if (intro?.classList.contains('passed-through')) showNav();
+  }
+
+  const introObserver = new MutationObserver(checkVisibility);
+  if (intro) introObserver.observe(intro, { attributes: true, attributeFilter: ['class'] });
+
+  window.addEventListener('scroll', checkVisibility, { passive: true });
+  checkVisibility();
+}
+
 // ─── BOOT ────────────────────────────────────────────────────────────────────
 
 function initPhotoScatterModal() {
@@ -815,4 +888,5 @@ document.addEventListener('DOMContentLoaded', () => {
   initProjectLinks();
   initPhotoScatterModal();
   initPolaroid();
+  initLeafNav();
 });

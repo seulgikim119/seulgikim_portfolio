@@ -551,21 +551,21 @@ section.leaf + section.leaf { border-top: 1px solid var(--rule); }
 }
 
 .section-title-clover-hope {
-  width: clamp(108px, 8.6vw, 160px);
+  width: clamp(140px, 10vw, 190px);
 }
 
 .section-title-clover-faith {
-  width: clamp(140px, 12vw, 220px);
+  width: clamp(140px, 10vw, 190px);
   transform: rotate(-4deg);
 }
 
 .section-title-clover-happiness {
-  width: clamp(140px, 11vw, 210px);
+  width: clamp(140px, 10vw, 190px);
   transform: rotate(5deg);
 }
 
 .section-title-clover-luck {
-  width: clamp(150px, 12vw, 230px);
+  width: clamp(140px, 10vw, 190px);
   transform: rotate(3deg);
 }
 .leaf-kw .kw-zh {
@@ -631,7 +631,7 @@ section.leaf + section.leaf { border-top: 1px solid var(--rule); }
   align-items: center;
   justify-content: center;
   align-self: center;
-  height: min(100%, clamp(520px, 66vh, 720px));
+  height: min(100%, clamp(440px, 62vh, 700px));
   overflow: visible;
 }
 .about-portrait .stripe {
@@ -671,8 +671,8 @@ section.leaf + section.leaf { border-top: 1px solid var(--rule); }
 }
 .scatter-photo-main {
   z-index: 4;
-  width: clamp(180px, 19vw, 300px);
-  padding-bottom: clamp(32px, 2.2vw, 44px);
+  width: clamp(160px, 15vw, 255px);
+  padding-bottom: clamp(28px, 2vw, 40px);
 }
 .scatter-photo img {
   display: block;
@@ -727,25 +727,25 @@ section.leaf + section.leaf { border-top: 1px solid var(--rule); }
 }
 .scatter-photo-1 { left: 9%; top: 9%; transform: rotate(-5deg); }
 .scatter-photo-2 {
-  right: 8%;
-  bottom: 27%;
-  width: clamp(152px, 16vw, 258px);
+  right: 7%;
+  bottom: 24%;
+  width: clamp(132px, 13vw, 218px);
   aspect-ratio: 4 / 5.4;
   transform: rotate(7deg);
 }
 .scatter-photo-3 {
-  left: 18%;
-  bottom: 7%;
-  width: clamp(146px, 15vw, 246px);
+  right: 16%;
+  bottom: 6%;
+  width: clamp(126px, 12vw, 204px);
   aspect-ratio: 4 / 5.4;
-  transform: rotate(0deg);
+  transform: rotate(-4deg);
 }
 .scatter-photo-1:hover,
 .scatter-photo-1:focus-visible { transform: rotate(-5deg) translateY(-8px) scale(1.04); }
 .scatter-photo-2:hover,
 .scatter-photo-2:focus-visible { transform: rotate(7deg) translateY(-8px) scale(1.04); }
 .scatter-photo-3:hover,
-.scatter-photo-3:focus-visible { transform: rotate(-6deg) translateY(-8px) scale(1.04); }
+.scatter-photo-3:focus-visible { transform: rotate(-4deg) translateY(-8px) scale(1.04); }
 .photo-modal {
   position: fixed;
   inset: 0;
@@ -807,6 +807,11 @@ section.leaf + section.leaf { border-top: 1px solid var(--rule); }
   font-size: 26px;
   line-height: 1;
   cursor: pointer;
+  transition: transform .2s cubic-bezier(.2, .9, .3, 1.05), background .18s ease;
+}
+.photo-modal-close:hover {
+  transform: scale(1.1) rotate(8deg);
+  background: rgba(251, 247, 235, 1);
 }
 .about-portrait .ph-label {
   position: absolute;
@@ -1174,7 +1179,7 @@ section.leaf + section.leaf { border-top: 1px solid var(--rule); }
 .project-info-card {
   min-height: 0;
   padding: clamp(16px, 2.4vh, 24px);
-  background: #fff;
+  background: var(--bg);
   border-radius: 24px;
   overflow: auto;
   scrollbar-width: none;
@@ -1302,7 +1307,7 @@ section.leaf + section.leaf { border-top: 1px solid var(--rule); }
   padding: clamp(18px, 2.3vh, 32px) clamp(24px, 3.2vw, 48px);
   border: 1px solid rgba(27, 42, 28, .08);
   border-radius: var(--radius-card);
-  background: #f2fedc;
+  background: var(--bg);
   box-shadow: var(--shadow-soft);
   grid-template-rows: auto minmax(0, 1fr);
   gap: clamp(12px, 1.8vh, 24px);
@@ -1469,7 +1474,7 @@ section.leaf + section.leaf { border-top: 1px solid var(--rule); }
   min-height: 0;
   padding: clamp(15px, 2vh, 26px) clamp(18px, 2.5vw, 32px);
   border-radius: 20px;
-  background: rgba(255, 253, 248, .92);
+  background: rgba(249, 251, 237, .96);
   box-shadow: 0 20px 42px -36px rgba(27, 42, 28, .42);
   overflow: visible;
   scrollbar-width: none;
@@ -1587,7 +1592,7 @@ section.leaf + section.leaf { border-top: 1px solid var(--rule); }
   padding: 26px clamp(12px, 2vw, 20px) 10px;
   border: 1px solid rgba(27, 42, 28, .08);
   border-radius: 20px;
-  background: #f2fedc;
+  background: var(--bg);
   box-shadow: 0 16px 38px -34px rgba(27, 42, 28, .42);
   backdrop-filter: blur(12px);
   color: rgba(27, 42, 28, .46);
@@ -1864,114 +1869,118 @@ section.leaf + section.leaf { border-top: 1px solid var(--rule); }
   animation-delay: var(--delay);
 }
 
-.travel-hover-1 {
-  left: 8%;
-  top: 16%;
-  --x: -78%;
-  --y: -18%;
-  --rot: -7deg;
+/* ── 왼쪽 3장 : 위→중간→아래 균등 배치 ── */
+.travel-hover-1 {   /* 왼쪽 상단 */
+  left: 7%;
+  top: 11%;
+  --x: -84%;
+  --y: -22%;
+  --rot: -8deg;
   --delay: 0s;
 }
 
-.travel-hover-2 {
-  right: 8%;
-  top: 14%;
-  --x: 76%;
-  --y: -16%;
-  --rot: 7deg;
-  --delay: -.45s;
-}
-
-.travel-hover-3 {
+.travel-hover-3 {   /* 왼쪽 중단 */
   left: 4%;
-  bottom: 30%;
-  --x: -82%;
-  --y: 2%;
-  --rot: 6deg;
+  top: 42%;
+  --x: -88%;
+  --y:  0%;
+  --rot:  5deg;
   --delay: -.9s;
 }
 
-.travel-hover-4 {
-  right: 4%;
-  bottom: 30%;
-  --x: 82%;
-  --y: 2%;
-  --rot: -6deg;
-  --delay: -1.35s;
-}
-
-.travel-hover-5 {
-  left: 24%;
-  top: 4%;
-  --x: -44%;
-  --y: -30%;
-  --rot: 4deg;
+.travel-hover-5 {   /* 왼쪽 하단 */
+  left: 7%;
+  bottom: 11%;
+  --x: -84%;
+  --y:  20%;
+  --rot: -5deg;
   --delay: -1.8s;
 }
 
-.travel-hover-6 {
-  right: 24%;
-  top: 4%;
-  --x: 44%;
-  --y: -30%;
+/* ── 오른쪽 4장 : 위→아래 균등 배치 ── */
+.travel-hover-6 {   /* 오른쪽 1번 (최상단) */
+  right: 6%;
+  top: 5%;
+  --x:  80%;
+  --y: -36%;
   --rot: -4deg;
   --delay: -2.25s;
 }
 
-.travel-hover-7 {
-  right: -2%;
+.travel-hover-2 {   /* 오른쪽 2번 */
+  right: 6%;
+  top: 30%;
+  --x:  84%;
+  --y: -10%;
+  --rot:  7deg;
+  --delay: -.45s;
+}
+
+.travel-hover-4 {   /* 오른쪽 3번 */
+  right: 6%;
+  top: 56%;
+  --x:  84%;
+  --y:  10%;
+  --rot: -6deg;
+  --delay: -1.35s;
+}
+
+.travel-hover-7 {   /* 오른쪽 4번 (최하단) */
+  right: 6%;
   left: auto;
-  bottom: 10%;
-  --x: 92%;
-  --y: 40%;
-  --rot: 3deg;
+  bottom: 5%;
+  --x:  78%;
+  --y:  34%;
+  --rot:  3deg;
   --delay: -2.7s;
 }
 
-.photo-hover-1 {
-  left: 6%;
-  top: 14%;
-  --x: -74%;
-  --y: -18%;
+/* ── 왼쪽 2장 : 위·아래 균등 배치 ── */
+.photo-hover-1 {   /* 왼쪽 상단 */
+  left: 7%;
+  top: 16%;
+  --x: -78%;
+  --y: -22%;
   --rot: -9deg;
   --delay: 0s;
 }
 
-.photo-hover-2 {
+.photo-hover-3 {   /* 왼쪽 하단 */
+  left: 7%;
+  bottom: 12%;
+  --x: -76%;
+  --y:  22%;
+  --rot:  7deg;
+  --delay: -1.3s;
+}
+
+/* ── 오른쪽 3장 : 위·중간·아래 균등 배치 ── */
+.photo-hover-2 {   /* 오른쪽 상단 */
   right: 6%;
-  top: 12%;
-  --x: 72%;
-  --y: -16%;
+  top: 8%;
+  --x: 76%;
+  --y: -28%;
   --rot: 8deg;
   --delay: -.7s;
 }
 
-.photo-hover-3 {
-  left: -1%;
-  bottom: 18%;
-  --x: -82%;
-  --y: 18%;
-  --rot: 7deg;
-  --delay: -1.3s;
-}
-
-.photo-hover-4 {
-  right: 2%;
-  bottom: 24%;
-  --x: 70%;
-  --y: 8%;
+.photo-hover-4 {   /* 오른쪽 중단 */
+  right: 6%;
+  top: 44%;
+  --x: 80%;
+  --y:  2%;
   --rot: -7deg;
   --delay: -2s;
 }
 
-.photo-hover-5 {
+.photo-hover-5 {   /* 오른쪽 하단 */
   left: auto;
-  right: -7%;
+  right: 6%;
   top: auto;
-  bottom: 2%;
+  bottom: 8%;
   width: clamp(58px, 6vw, 92px);
-  --x: 86%;
-  --y: 42%;
+  --x: 76%;
+  --y:  26%;
   --rot: -4deg;
   --delay: -2.7s;
 }
@@ -2328,13 +2337,47 @@ section.leaf + section.leaf { border-top: 1px solid var(--rule); }
   letter-spacing: .25em;
   text-transform: uppercase;
   color: var(--ink-mute);
-  background: var(--bg);
+  background: var(--section-bg);
 }
 .foot .sig {
   text-transform: none;
   letter-spacing: 0;
   font-size: 13px;
   color: var(--ink-soft);
+}
+
+@media (max-width: 540px) {
+  .foot {
+    flex-direction: column;
+    gap: 10px;
+    text-align: center;
+    padding-top: clamp(24px, 4vh, 40px);
+    padding-bottom: clamp(24px, 4vh, 40px);
+  }
+
+  /* about portrait: aspect-ratio 16/8 해제 → 충분한 세로 확보 */
+  .about-portrait {
+    aspect-ratio: auto;
+    height: clamp(310px, 86vw, 420px);
+    min-height: 310px;
+  }
+  .photo-scatter-board {
+    min-height: 288px;
+  }
+
+  /* scatter photo 위치 재배분 — 310px 이상 컨테이너 기준 */
+  .scatter-photo-1 { left: 4%; top: 5%; }
+  .scatter-photo-2 {
+    right: 4%;
+    bottom: 20%;
+    width: clamp(100px, 32vw, 132px);
+  }
+  .scatter-photo-3 {
+    left: 26%;
+    bottom: 3%;
+    width: clamp(94px, 30vw, 124px);
+  }
+  .scatter-photo-main { width: clamp(118px, 38vw, 155px); }
 }
 
 /* ── Decorative corner clovers ── */
@@ -2356,20 +2399,20 @@ section.leaf + section.leaf { border-top: 1px solid var(--rule); }
     font-size: clamp(40px, 6.4vw, 82px);
   }
   .about-grid {
-    grid-template-columns: minmax(360px, .88fr) minmax(520px, 1.12fr);
-    gap: clamp(30px, 4.2vw, 58px);
+    grid-template-columns: minmax(320px, .88fr) minmax(460px, 1.12fr);
+    gap: clamp(24px, 3.8vw, 58px);
   }
   .about-portrait {
-    height: min(100%, clamp(560px, 70vh, 760px));
+    height: min(100%, clamp(480px, 64vh, 700px));
   }
   .scatter-photo-main {
-    width: clamp(190px, 23vw, 300px);
+    width: clamp(148px, 17vw, 220px);
   }
   .scatter-photo-2 {
-    width: clamp(160px, 19vw, 250px);
+    width: clamp(126px, 14vw, 192px);
   }
   .scatter-photo-3 {
-    width: clamp(154px, 18vw, 238px);
+    width: clamp(120px, 13vw, 180px);
   }
   .project-case {
     width: min(1280px, 100%);
@@ -2502,6 +2545,7 @@ section.leaf + section.leaf { border-top: 1px solid var(--rule); }
     overflow: visible;
   }
   .about-grid, .contact-wrap { grid-template-columns: 1fr; gap: clamp(18px, 3vh, 30px); }
+  .about-grid { grid-template-rows: auto minmax(0, 1fr); }
   .contact-form-grid { grid-template-columns: 1fr; }
   #leaf4 .contact-cover-content,
   #leaf4 .contact-cover-content.is-reveal-active {
@@ -2530,12 +2574,12 @@ section.leaf + section.leaf { border-top: 1px solid var(--rule); }
     height: 54px;
     font-size: 25px;
   }
-  .about-portrait { aspect-ratio: 16/8; min-height: 220px; }
-  .photo-scatter-board { min-height: 220px; }
-  .scatter-photo { width: clamp(104px, 24vw, 160px); }
-  .scatter-photo-main { width: clamp(126px, 32vw, 190px); }
-  .scatter-photo-2 { width: clamp(116px, 28vw, 178px); }
-  .scatter-photo-3 { width: clamp(110px, 27vw, 170px); }
+  .about-portrait { height: auto; aspect-ratio: 16/8; min-height: 200px; max-height: clamp(280px, 48vw, 500px); }
+  .photo-scatter-board { min-height: 200px; }
+  .scatter-photo { width: clamp(104px, 24vw, 180px); }
+  .scatter-photo-main { width: clamp(140px, 22vw, 260px); }
+  .scatter-photo-2 { width: clamp(130px, 20vw, 240px); }
+  .scatter-photo-3 { width: clamp(124px, 19vw, 228px); }
   .resume-grid { grid-template-columns: 1fr; }
   .resume-row { display: grid; grid-template-columns: 1fr; gap: 28px; }
   .resume-row:first-child .resume-section,
@@ -2553,13 +2597,12 @@ section.leaf + section.leaf { border-top: 1px solid var(--rule); }
   .leaf-title-row {
     gap: clamp(10px, 3vw, 18px);
   }
-  .section-title-clover {
-    width: clamp(62px, 15vw, 108px);
-  }
+  .section-title-clover,
+  .section-title-clover-hope,
   .section-title-clover-faith,
   .section-title-clover-happiness,
   .section-title-clover-luck {
-    width: clamp(78px, 18vw, 126px);
+    width: clamp(72px, 16vw, 108px);
   }
   .leaf-header { gap: 12px; }
   .leaf-kw {
@@ -2762,12 +2805,20 @@ section.leaf + section.leaf { border-top: 1px solid var(--rule); }
   .photo-hover-item {
     width: clamp(54px, 16vw, 84px);
   }
-  .travel-hover-7,
+  .travel-hover-7 {
+    right: 4%;
+    left: auto;
+    bottom: 6%;
+    --x: 70%;
+    --y: 28%;
+  }
   .photo-hover-5 {
-    right: 2%;
-    bottom: 12%;
-    --x: 56%;
-    --y: 30%;
+    right: 4%;
+    left: auto;
+    bottom: 10%;
+    top: auto;
+    --x: 58%;
+    --y: 26%;
   }
   .polaroid-arrow.left  { left: 2vw; }
   .polaroid-arrow.right { right: 2vw; }
@@ -2797,10 +2848,10 @@ section.leaf + section.leaf { border-top: 1px solid var(--rule); }
     gap: clamp(16px, 3vw, 28px);
   }
   .about-portrait {
-    height: min(100%, clamp(360px, 58vh, 480px));
+    height: min(100%, clamp(300px, 54vh, 440px));
   }
   .photo-scatter-board {
-    min-height: 220px;
+    min-height: 200px;
   }
   .about-lede {
     font-size: clamp(17px, 2.3vh, 20px);
@@ -2881,5 +2932,164 @@ section.leaf + section.leaf { border-top: 1px solid var(--rule); }
   }
   .polaroid-caption {
     padding-top: 0;
+  }
+}
+
+/* ── Leaf Side Navigation ─────────────────────────────────────────────────── */
+
+@keyframes leaf-nav-item-in {
+  from {
+    opacity: 0;
+    transform: translateX(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.leaf-nav {
+  position: fixed;
+  right: clamp(14px, 2.2vw, 34px);
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: clamp(4px, .7vh, 10px);
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.leaf-nav.is-visible {
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.leaf-nav.is-visible .leaf-nav-item {
+  animation: leaf-nav-item-in .45s cubic-bezier(.2, .9, .3, 1.05) both;
+  animation-delay: calc(var(--nav-i, 0) * 68ms + 80ms);
+}
+
+.leaf-nav-item {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: clamp(4px, .5vw, 8px);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.leaf-nav-label {
+  font-size: clamp(7px, .58vw, 9px);
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: .08em;
+  color: var(--ink-mute);
+  white-space: nowrap;
+  opacity: 0;
+  order: -1;
+  transform: translateX(6px);
+  transition: opacity .22s cubic-bezier(.4, 0, .2, 1),
+              color .22s ease,
+              transform .26s cubic-bezier(.2, .9, .3, 1.05);
+  pointer-events: none;
+}
+
+.leaf-nav-item img {
+  width: clamp(28px, 2.6vw, 40px);
+  height: auto;
+  display: block;
+  flex-shrink: 0;
+  filter: saturate(.28) brightness(1.1) drop-shadow(0 2px 4px rgba(35, 70, 28, .1));
+  transform: rotate(8deg);
+  transform-origin: center;
+  transition:
+    filter .3s cubic-bezier(.4, 0, .2, 1),
+    transform .32s cubic-bezier(.2, .9, .3, 1.05);
+  will-change: transform, filter;
+}
+
+.leaf-nav-item:hover img {
+  filter: saturate(.72) brightness(1.04) drop-shadow(0 4px 8px rgba(35, 70, 28, .18));
+  transform: rotate(8deg) scale(1.14);
+}
+
+.leaf-nav-item:hover .leaf-nav-label {
+  opacity: .7;
+  transform: translateX(0);
+  color: var(--ink-soft);
+}
+
+.leaf-nav-item.is-active img {
+  filter: saturate(1) brightness(1) drop-shadow(0 6px 14px rgba(35, 70, 28, .26));
+  transform: rotate(8deg) scale(1.32);
+}
+
+.leaf-nav-item.is-active .leaf-nav-label {
+  opacity: 1;
+  transform: translateX(0);
+  color: var(--green);
+}
+
+/* 1280px 이하 */
+@media (max-width: 1280px) {
+  .leaf-nav {
+    right: clamp(10px, 1.6vw, 20px);
+  }
+  .leaf-nav-item img {
+    width: clamp(26px, 2.4vw, 34px);
+  }
+}
+
+/* 900px 이하: 레이블 숨김 */
+@media (max-width: 900px) {
+  .leaf-nav {
+    right: clamp(6px, 1.4vw, 12px);
+    gap: clamp(3px, .6vh, 7px);
+  }
+  .leaf-nav-item img {
+    width: clamp(20px, 3vw, 28px);
+  }
+  .leaf-nav-label {
+    display: none;
+  }
+}
+
+/* 600px 이하: 하단 수평 pill 네비 */
+@media (max-width: 600px) {
+  .leaf-nav {
+    right: auto;
+    bottom: clamp(14px, 3.5vw, 22px);
+    top: auto;
+    left: 50%;
+    transform: translateX(-50%);
+    flex-direction: row;
+    align-items: center;
+    gap: clamp(16px, 5vw, 28px);
+    padding: clamp(8px, 2vw, 12px) clamp(18px, 5.5vw, 26px);
+    background: rgba(249, 251, 237, .88);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid var(--rule);
+    border-radius: 100px;
+    box-shadow: 0 4px 24px rgba(27, 42, 28, .12), 0 1px 4px rgba(27, 42, 28, .06);
+  }
+  .leaf-nav.is-visible .leaf-nav-item {
+    animation-delay: calc(var(--nav-i, 0) * 55ms + 60ms);
+  }
+  .leaf-nav-item {
+    flex-direction: column;
+    gap: 0;
+  }
+  .leaf-nav-item img {
+    width: clamp(24px, 6vw, 32px);
+  }
+  .leaf-nav-item.is-active img {
+    transform: rotate(8deg) scale(1.22);
+  }
+  .leaf-nav-label {
+    display: none;
   }
 }
